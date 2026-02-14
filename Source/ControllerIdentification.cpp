@@ -267,8 +267,10 @@ namespace Xidi
     {
       Infra::Message::OutputFormatted(
           Infra::Message::ESeverity::Warning,
-          L"Unable to check if device with instance GUID %s supports XInput: Failed to create the device (result = 0x%08x).",
+          L"Unable to check if device with instance GUID %s supports physical controller backend \"%.*s\": Failed to create the device (result = 0x%08x).",
           Strings::GuidToString(instanceGUID).AsCString(),
+          static_cast<int>(Controller::GetPhysicalControllerBackendName().length()),
+          Controller::GetPhysicalControllerBackendName().data(),
           static_cast<unsigned int>(result));
       return false;
     }
@@ -286,8 +288,10 @@ namespace Xidi
     {
       Infra::Message::OutputFormatted(
           Infra::Message::ESeverity::Warning,
-          L"Unable to check if device with instance GUID %s supports XInput: Failed to query for property DIPROP_GUIDANDPATH (result = 0x%08x).",
+          L"Unable to check if device with instance GUID %s supports physical controller backend \"%.*s\": Failed to query for property DIPROP_GUIDANDPATH (result = 0x%08x).",
           Strings::GuidToString(instanceGUID).AsCString(),
+          static_cast<int>(Controller::GetPhysicalControllerBackendName().length()),
+          Controller::GetPhysicalControllerBackendName().data(),
           static_cast<unsigned int>(result));
       return false;
     }

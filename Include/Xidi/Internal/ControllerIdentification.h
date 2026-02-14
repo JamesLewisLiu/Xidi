@@ -86,7 +86,8 @@ namespace Xidi
   /// @param [in] instanceGUID DirectInput instance GUID identifying the controller and obtained
   /// from the IDirectInput context.
   /// @param [out] devicePath If present, will be filled with the device identifying path, which was
-  /// used to determine whether or not the controller supports XInput.
+  /// used to determine whether or not the controller supports the configured physical controller
+  /// backend.
   /// @return `true` if the configured physical controller backend supports the controller, `false`
   /// if not or if this information could not be determined.
   template <EDirectInputVersion diVersion> bool DoesDirectInputControllerSupportConfiguredBackend(
