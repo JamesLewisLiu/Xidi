@@ -22,8 +22,8 @@
 
 #include "ApiBitSet.h"
 #include "ApiDirectInput.h"
-#include "ControllerTypes.h"
 #include "Strings.h"
+#include "VirtualControllerTypes.h"
 
 // Handler for invalid or unselectable object data format specifications.
 // If the object specification marks the object as optional, it is skipped. Otherwise, the entire

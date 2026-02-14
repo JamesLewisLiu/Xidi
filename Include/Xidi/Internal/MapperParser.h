@@ -18,10 +18,10 @@
 
 #include <Infra/Core/ValueOrError.h>
 
-#include "ControllerTypes.h"
 #include "ElementMapper.h"
 #include "ForceFeedbackTypes.h"
 #include "Mapper.h"
+#include "VirtualControllerTypes.h"
 
 namespace Xidi
 {
@@ -325,5 +325,5 @@ namespace Xidi
       /// otherwise.
       ForceFeedbackActuatorOrError ParseForceFeedbackActuator(std::wstring_view ffActuatorString);
     } // namespace MapperParser
-  }   // namespace Controller
+  } // namespace Controller
 } // namespace Xidi

@@ -24,11 +24,11 @@
 #include "Strings.h"
 
 #ifndef XIDI_SKIP_MAPPERS
-#include "ControllerTypes.h"
 #include "ElementMapper.h"
 #include "Mapper.h"
 #include "MapperBuilder.h"
 #include "MapperParser.h"
+#include "VirtualControllerTypes.h"
 #endif
 
 namespace Xidi
@@ -390,7 +390,7 @@ namespace Xidi
           // Create the per-controller mapper settings types and submit them to the configuration
           // file layout. These are gernerated dynamically based on the number of controllers the
           // system supports.
-          for (Controller::TControllerIdentifier i = 0; i < Controller::kPhysicalControllerCount;
+          for (Controller::TControllerIdentifier i = 0; i < Controller::kVirtualControllerMaxCount;
                ++i)
             configurationFileLayout[Strings::kStrConfigurationSectionMapper]
                                    [Strings::MapperTypeConfigurationNameString(i)] =

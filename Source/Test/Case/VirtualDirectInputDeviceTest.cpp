@@ -23,10 +23,10 @@
 #include "ApiGUID.h"
 #include "ApiWindows.h"
 #include "ControllerIdentification.h"
-#include "ControllerTypes.h"
 #include "DataFormat.h"
 #include "Mapper.h"
 #include "MockPhysicalController.h"
+#include "VirtualControllerTypes.h"
 #include "VirtualDirectInputEffect.h"
 
 namespace XidiTest

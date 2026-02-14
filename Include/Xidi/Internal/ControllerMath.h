@@ -14,7 +14,7 @@
 
 #include <cstdint>
 
-#include "ControllerTypes.h"
+#include "PhysicalControllerTypes.h"
 
 namespace Xidi
 {
@@ -111,5 +111,5 @@ namespace Xidi
       SAnalogStickCoordinates TransformCoordinatesCircleToSquare(
           SAnalogStickCoordinates cirleCoords, double amountFraction);
     } // namespace Math
-  }   // namespace Controller
+  } // namespace Controller
 } // namespace Xidi

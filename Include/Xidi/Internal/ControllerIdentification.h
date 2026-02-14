@@ -18,7 +18,7 @@
 #include <string_view>
 
 #include "ApiDirectInput.h"
-#include "ControllerTypes.h"
+#include "VirtualControllerTypes.h"
 
 namespace Xidi
 {

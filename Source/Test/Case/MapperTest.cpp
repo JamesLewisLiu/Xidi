@@ -22,10 +22,10 @@
 
 #include "ApiBitSet.h"
 #include "ApiWindows.h"
-#include "ControllerTypes.h"
 #include "ElementMapper.h"
 #include "ForceFeedbackTypes.h"
 #include "MockElementMapper.h"
+#include "VirtualControllerTypes.h"
 
 namespace XidiTest
 {

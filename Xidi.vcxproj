@@ -124,7 +124,6 @@
     <ClInclude Include="Include\Xidi\Internal\ConcurrencyWrapper.h" />
     <ClInclude Include="Include\Xidi\Internal\ControllerIdentification.h" />
     <ClInclude Include="Include\Xidi\Internal\ControllerMath.h" />
-    <ClInclude Include="Include\Xidi\Internal\ControllerTypes.h" />
     <ClInclude Include="Include\Xidi\Internal\DataFormat.h" />
     <ClInclude Include="Include\Xidi\Internal\DirectInputClassFactory.h" />
     <ClInclude Include="Include\Xidi\Internal\DllFunctions.h" />
@@ -153,6 +152,9 @@
     <ClInclude Include="Include\Xidi\Internal\WrapperIDirectInput.h" />
     <ClInclude Include="Include\Xidi\Internal\WrapperJoyWinMM.h" />
     <ClInclude Include="Include\Xidi\Internal\XidiConfigReader.h" />
+    <ClInclude Include="Include\Xidi\PhysicalControllerTypes.h" />
+    <ClInclude Include="Include\Xidi\Plugin.h" />
+    <ClInclude Include="Include\Xidi\VirtualControllerTypes.h" />
     <ClInclude Include="Resources\Xidi.h" />
   </ItemGroup>
   <ItemGroup>

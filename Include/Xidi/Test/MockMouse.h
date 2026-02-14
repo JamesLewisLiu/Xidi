@@ -19,8 +19,9 @@
 #include <unordered_map>
 
 #include "ApiBitSet.h"
-#include "ControllerTypes.h"
 #include "Mouse.h"
+#include "PhysicalControllerTypes.h"
+#include "VirtualControllerTypes.h"
 
 namespace XidiTest
 {

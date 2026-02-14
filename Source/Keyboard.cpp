@@ -22,7 +22,6 @@
 
 #include "ApiBitSet.h"
 #include "ApiWindows.h"
-#include "ControllerTypes.h"
 #include "Globals.h"
 
 namespace Xidi

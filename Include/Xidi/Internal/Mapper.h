@@ -17,9 +17,10 @@
 
 #include "ApiBitSet.h"
 #include "ApiWindows.h"
-#include "ControllerTypes.h"
 #include "ElementMapper.h"
 #include "ForceFeedbackTypes.h"
+#include "PhysicalControllerTypes.h"
+#include "VirtualControllerTypes.h"
 
 /// Computes the index of the specified named controller element in the unnamed array representation
 /// of the element map.

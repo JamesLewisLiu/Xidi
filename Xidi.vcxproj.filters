@@ -47,9 +47,6 @@
     <ClInclude Include="Include\Xidi\Internal\ControllerMath.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Xidi\Internal\ControllerTypes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Include\Xidi\Internal\DataFormat.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -132,6 +129,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Include\Xidi\Internal\ExportApiDirectInput.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Xidi\Plugin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Xidi\PhysicalControllerTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Xidi\VirtualControllerTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

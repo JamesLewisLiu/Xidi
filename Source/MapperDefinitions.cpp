@@ -9,9 +9,9 @@
  *   Definitions of all known mapper types.
  **************************************************************************************************/
 
-#include "ControllerTypes.h"
 #include "ElementMapper.h"
 #include "Mapper.h"
+#include "VirtualControllerTypes.h"
 
 namespace Xidi
 {

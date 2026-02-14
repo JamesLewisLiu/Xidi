@@ -17,7 +17,7 @@
 #include <boost/circular_buffer.hpp>
 
 #include "ApiWindows.h"
-#include "ControllerTypes.h"
+#include "VirtualControllerTypes.h"
 
 namespace Xidi
 {

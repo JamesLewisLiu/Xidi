@@ -13,10 +13,10 @@
 
 #include <Infra/Test/TestCase.h>
 
-#include "ControllerTypes.h"
 #include "ForceFeedbackParameters.h"
 #include "ForceFeedbackTypes.h"
 #include "MockForceFeedbackEffect.h"
+#include "VirtualControllerTypes.h"
 
 namespace XidiTest
 {

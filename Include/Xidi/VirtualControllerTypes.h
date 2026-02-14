@@ -5,7 +5,7 @@
  * Authored by Samuel Grossman
  * Copyright (c) 2016-2026
  ***********************************************************************************************//**
- * @file ControllerTypes.h
+ * @file VirtualControllerTypes.h
  *   Declaration of constants and types used for representing virtual controllers and their state.
  **************************************************************************************************/
 
@@ -21,38 +21,13 @@ namespace Xidi
 {
   namespace Controller
   {
-    /// Number of physical controllers that the underlying system supports.
-    /// Not all will necessarily be physically present at any given time.
-    /// Maximum allowable controller identifier is one less than this value.
-    inline constexpr uint16_t kPhysicalControllerCount = 4;
-
-    /// Maximum possible reading from an XInput controller's analog stick.
-    /// Value taken from XInput documentation.
-    inline constexpr int32_t kAnalogValueMax = 32767;
-
-    /// Minimum possible reading from an XInput controller's analog stick.
-    /// Value derived from the above to ensure symmetry around 0.
-    /// This is slightly different than the XInput API itself, which allows negative values all the
-    /// way down to -32768.
-    inline constexpr int32_t kAnalogValueMin = -kAnalogValueMax;
-
-    /// Neutral value for an XInput controller's analog stick.
-    /// Value computed from extreme value constants above.
-    inline constexpr int32_t kAnalogValueNeutral = (kAnalogValueMax + kAnalogValueMin) / 2;
-
-    /// Maximum possible reading from an XInput controller's trigger.
-    /// Value taken from XInput documentation.
-    inline constexpr int32_t kTriggerValueMax = 255;
-
-    /// Maximum possible reading from an XInput controller's trigger.
-    /// Value taken from XInput documentation.
-    inline constexpr int32_t kTriggerValueMin = 0;
-
-    /// Midpoint reading from an XInput controller's trigger.
-    inline constexpr int32_t kTriggerValueMid = (kTriggerValueMax + kTriggerValueMin) / 2;
-
-    /// Integer type used to identify physical controllers to the underlying system interfaces.
-    using TControllerIdentifier = std::remove_const_t<decltype(kPhysicalControllerCount)>;
+    /// Integer type used to identify physical controllers by index.
+    using TControllerIdentifier = uint16_t;
+    
+    /// Maximum number of virtual controllers that Xidi supports. Not all will necessarily be
+    /// physically present at any given time or even supported by the controller back-end. Highest
+    /// allowable controller identifier is one less than this value.
+    inline constexpr TControllerIdentifier kVirtualControllerMaxCount = 4;
 
     /// Enumerates all supported axis types using DirectInput terminology.
     /// It is not necessarily the case that all of these axes are present in a virtual controller.
@@ -426,126 +401,5 @@ namespace Xidi
     };
 
     static_assert(sizeof(SState) <= 32, "Data structure size constraint violation.");
-
-    /// Enumerates possible statuses for physical controller devices.
-    enum class EPhysicalDeviceStatus : uint8_t
-    {
-      /// Device is connected and functioning correctly
-      Ok,
-
-      /// Device is not connected and has not reported an error
-      NotConnected,
-
-      /// Device has experienced an error
-      Error,
-
-      /// Sentinel value, total number of enumerators
-      Count
-    };
-
-    /// Enumerates all analog sticks that might be present on a physical controller.
-    /// One enumerator exists per possible stick.
-    enum class EPhysicalStick : uint8_t
-    {
-      LeftX,
-      LeftY,
-      RightX,
-      RightY,
-
-      /// Sentinel value, total number of enumerators
-      Count
-    };
-
-    /// Enumerates all analog triggers that might be present on a physical controller.
-    /// One enumerator exists per possible trigger.
-    enum class EPhysicalTrigger : uint8_t
-    {
-      LT,
-      RT,
-
-      /// Sentinel value, total number of enumerators
-      Count
-    };
-
-    /// Enumerates all digital buttons that might be present on a physical controller. As an
-    /// implementation simplification, the order of enumerators corresponds to the ordering used in
-    /// XInput. One enumerator exists per possible button. Guide and Share buttons are not actually
-    /// used, but they still have space allocated for them on a speculative basis.
-    enum class EPhysicalButton : uint8_t
-    {
-      DpadUp,
-      DpadDown,
-      DpadLeft,
-      DpadRight,
-      Start,
-      Back,
-      LS,
-      RS,
-      LB,
-      RB,
-      UnusedGuide,
-      UnusedShare,
-      A,
-      B,
-      X,
-      Y,
-
-      /// Sentinel value, total number of enumerators
-      Count
-    };
-
-    /// Data format for representing physical controller state, as received from controller devices
-    /// and before being passed through a mapper.
-    struct SPhysicalState
-    {
-      /// Whether or not the physical state represented by this object was successfully read from a
-      /// controller device.
-      EPhysicalDeviceStatus deviceStatus;
-
-      /// Analog stick values read from the physical controller, one element per possible stick and
-      /// axis direction.
-      std::array<int16_t, static_cast<int>(EPhysicalStick::Count)> stick;
-
-      /// Analog trigger values read from the physical controller, one element per possible trigger.
-      std::array<uint8_t, static_cast<int>(EPhysicalTrigger::Count)> trigger;
-
-      /// Digital button values read from the physical controller, one element per possible digital
-      /// button.
-      std::bitset<static_cast<int>(EPhysicalButton::Count)> button;
-
-      constexpr bool operator==(const SPhysicalState& other) const = default;
-
-      constexpr int16_t operator[](EPhysicalStick desiredStick) const
-      {
-        return stick[static_cast<int>(desiredStick)];
-      }
-
-      constexpr uint8_t operator[](EPhysicalTrigger desiredTrigger) const
-      {
-        return trigger[static_cast<int>(desiredTrigger)];
-      }
-
-      constexpr bool operator[](EPhysicalButton desiredButton) const
-      {
-        return button[static_cast<int>(desiredButton)];
-      }
-
-      constexpr decltype(stick)::reference operator[](EPhysicalStick desiredStick)
-      {
-        return stick[static_cast<int>(desiredStick)];
-      }
-
-      constexpr decltype(trigger)::reference operator[](EPhysicalTrigger desiredTrigger)
-      {
-        return trigger[static_cast<int>(desiredTrigger)];
-      }
-
-      constexpr decltype(button)::reference operator[](EPhysicalButton desiredButton)
-      {
-        return button[static_cast<int>(desiredButton)];
-      }
-    };
-
-    static_assert(sizeof(SPhysicalState) <= 16, "Data structure size constraint violation.");
   } // namespace Controller
 } // namespace Xidi

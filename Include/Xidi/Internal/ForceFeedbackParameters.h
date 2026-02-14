@@ -15,8 +15,8 @@
 #include <array>
 #include <optional>
 
-#include "ControllerTypes.h"
 #include "ForceFeedbackTypes.h"
+#include "VirtualControllerTypes.h"
 
 namespace Xidi
 {
@@ -299,5 +299,5 @@ namespace Xidi
         }
       };
     } // namespace ForceFeedback
-  }   // namespace Controller
+  } // namespace Controller
 } // namespace Xidi

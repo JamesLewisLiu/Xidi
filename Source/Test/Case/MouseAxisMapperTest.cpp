@@ -12,10 +12,10 @@
 
 #include <Infra/Test/TestCase.h>
 
-#include "ControllerTypes.h"
 #include "ElementMapper.h"
 #include "MockMouse.h"
 #include "Mouse.h"
+#include "VirtualControllerTypes.h"
 
 namespace XidiTest
 {

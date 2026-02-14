@@ -17,11 +17,11 @@
 
 #include <Infra/Core/Message.h>
 
-#include "ControllerTypes.h"
 #include "ForceFeedbackTypes.h"
 #include "ImportApiWinMM.h"
 #include "Mapper.h"
 #include "PhysicalController.h"
+#include "VirtualControllerTypes.h"
 
 namespace Xidi
 {

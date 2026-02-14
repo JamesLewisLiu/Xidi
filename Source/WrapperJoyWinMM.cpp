@@ -26,13 +26,13 @@
 #include "ApiDirectInput.h"
 #include "ApiWindows.h"
 #include "ControllerIdentification.h"
-#include "ControllerTypes.h"
 #include "DataFormat.h"
 #include "Globals.h"
 #include "ImportApiDirectInput.h"
 #include "ImportApiWinMM.h"
 #include "Strings.h"
 #include "VirtualController.h"
+#include "VirtualControllerTypes.h"
 
 /// Logs a WinMM device-specific function invocation.
 #define LOG_INVOCATION(severity, joyID, result)                                                    \
@@ -87,7 +87,7 @@ namespace Xidi
     };
 
     /// Fixed set of virtual controllers.
-    static Controller::VirtualController* controllers[Controller::kPhysicalControllerCount];
+    static Controller::VirtualController* controllers[Controller::kVirtualControllerMaxCount];
 
     /// Maps from application-specified joystick index to the actual indices to present to WinMM or
     /// use internally. Negative values indicate XInput controllers, others indicate values to be

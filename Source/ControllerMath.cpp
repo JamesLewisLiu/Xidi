@@ -14,7 +14,7 @@
 
 #include <cmath>
 
-#include "ControllerTypes.h"
+#include "PhysicalControllerTypes.h"
 
 namespace Xidi
 {
@@ -90,5 +90,5 @@ namespace Xidi
         };
       }
     } // namespace Math
-  }   // namespace Controller
+  } // namespace Controller
 } // namespace Xidi

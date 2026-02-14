@@ -17,10 +17,10 @@
 #include <string_view>
 
 #include "ApiWindows.h"
-#include "ControllerTypes.h"
 #include "ElementMapper.h"
 #include "ForceFeedbackTypes.h"
 #include "Mapper.h"
+#include "VirtualControllerTypes.h"
 
 namespace Xidi
 {

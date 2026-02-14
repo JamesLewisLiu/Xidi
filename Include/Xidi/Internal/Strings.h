@@ -22,7 +22,7 @@
 
 #include <Infra/Core/TemporaryBuffer.h>
 
-#include "ControllerTypes.h"
+#include "VirtualControllerTypes.h"
 
 // Strings that need to be available in multiple formats (ASCII and Unicode).
 #define XIDI_AXIS_NAME_X                                       "X Axis"

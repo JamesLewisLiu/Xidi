@@ -16,8 +16,9 @@
 #include <Infra/Test/TestCase.h>
 
 #include "ApiWindows.h"
-#include "ControllerTypes.h"
 #include "ElementMapper.h"
+#include "PhysicalControllerTypes.h"
+#include "VirtualControllerTypes.h"
 
 namespace XidiTest
 {

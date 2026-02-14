@@ -20,11 +20,11 @@
 #include <thread>
 #include <utility>
 
-#include "ControllerTypes.h"
 #include "ForceFeedbackDevice.h"
 #include "ForceFeedbackTypes.h"
 #include "Mapper.h"
 #include "StateChangeEventBuffer.h"
+#include "VirtualControllerTypes.h"
 
 namespace Xidi
 {

@@ -26,7 +26,7 @@
 #include <Infra/Core/TemporaryBuffer.h>
 
 #include "ApiWindows.h"
-#include "ControllerTypes.h"
+#include "VirtualControllerTypes.h"
 
 namespace Xidi
 {
@@ -238,7 +238,7 @@ namespace Xidi
     std::wstring_view MapperTypeConfigurationNameString(
         Controller::TControllerIdentifier controllerIdentifier)
     {
-      static std::wstring initStrings[Controller::kPhysicalControllerCount];
+      static std::wstring initStrings[Controller::kVirtualControllerMaxCount];
       static std::once_flag initFlag;
 
       std::call_once(
@@ -256,7 +256,7 @@ namespace Xidi
             }
           });
 
-      if (controllerIdentifier >= Controller::kPhysicalControllerCount) return std::wstring_view();
+      if (controllerIdentifier >= Controller::kVirtualControllerMaxCount) return std::wstring_view();
 
       return initStrings[controllerIdentifier];
     }

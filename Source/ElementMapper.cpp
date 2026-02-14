@@ -17,11 +17,11 @@
 #include <optional>
 
 #include "ControllerMath.h"
-#include "ControllerTypes.h"
 #include "Globals.h"
 #include "Keyboard.h"
 #include "Mouse.h"
 #include "Strings.h"
+#include "VirtualControllerTypes.h"
 
 namespace Xidi
 {

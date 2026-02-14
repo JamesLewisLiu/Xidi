@@ -21,6 +21,8 @@
 #include "ApiWindows.h"
 #include "ElementMapper.h"
 #include "MockElementMapper.h"
+#include "PhysicalControllerTypes.h"
+#include "VirtualControllerTypes.h"
 
 namespace XidiTest
 {

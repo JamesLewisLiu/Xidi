@@ -22,11 +22,11 @@
 #include <Infra/Test/TestCase.h>
 
 #include "ApiWindows.h"
-#include "ControllerTypes.h"
 #include "ElementMapper.h"
 #include "ForceFeedbackDevice.h"
 #include "MockPhysicalController.h"
 #include "StateChangeEventBuffer.h"
+#include "VirtualControllerTypes.h"
 
 namespace XidiTest
 {

@@ -13,8 +13,9 @@
 #pragma once
 
 #include "ApiBitSet.h"
-#include "ControllerTypes.h"
 #include "Keyboard.h"
+#include "PhysicalControllerTypes.h"
+#include "VirtualControllerTypes.h"
 
 namespace XidiTest
 {

@@ -24,11 +24,11 @@
 #include "ApiBitSet.h"
 #include "ApiWindows.h"
 #include "ControllerMath.h"
-#include "ControllerTypes.h"
 #include "ElementMapper.h"
 #include "ForceFeedbackTypes.h"
 #include "Globals.h"
 #include "Strings.h"
+#include "VirtualControllerTypes.h"
 
 namespace Xidi
 {
@@ -439,7 +439,7 @@ namespace Xidi
 
     const Mapper* Mapper::GetConfigured(TControllerIdentifier controllerIdentifier)
     {
-      static const Mapper* configuredMapper[kPhysicalControllerCount];
+      static const Mapper* configuredMapper[kVirtualControllerMaxCount];
       static std::once_flag configuredMapperFlag;
 
       std::call_once(

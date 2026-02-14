@@ -14,9 +14,10 @@
 #include <stop_token>
 
 #include "ApiWindows.h"
-#include "ControllerTypes.h"
 #include "ForceFeedbackDevice.h"
+#include "PhysicalControllerTypes.h"
 #include "VirtualController.h"
+#include "VirtualControllerTypes.h"
 
 namespace Xidi
 {

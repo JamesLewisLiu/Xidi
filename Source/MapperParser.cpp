@@ -24,12 +24,12 @@
 #include <Infra/Core/ValueOrError.h>
 
 #include "ApiDirectInput.h"
-#include "ControllerTypes.h"
 #include "ElementMapper.h"
 #include "ForceFeedbackTypes.h"
 #include "Keyboard.h"
 #include "Mapper.h"
 #include "Mouse.h"
+#include "VirtualControllerTypes.h"
 
 namespace Xidi
 {
@@ -1397,5 +1397,5 @@ namespace Xidi
         return makeForceFeedbackActuatorIter->second(kForceFeedbackActuatorStringParts.params);
       }
     } // namespace MapperParser
-  }   // namespace Controller
+  } // namespace Controller
 } // namespace Xidi

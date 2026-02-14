@@ -19,9 +19,9 @@
 #include <Infra/Test/Utilities.h>
 
 #include "ApiDirectInput.h"
-#include "ControllerTypes.h"
 #include "ElementMapper.h"
 #include "Mapper.h"
+#include "VirtualControllerTypes.h"
 
 namespace XidiTest
 {

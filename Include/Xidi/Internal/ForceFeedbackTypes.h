@@ -15,7 +15,8 @@
 #include <array>
 #include <cstdint>
 
-#include "ControllerTypes.h"
+#include "PhysicalControllerTypes.h"
+#include "VirtualControllerTypes.h"
 
 namespace Xidi
 {
@@ -32,24 +33,9 @@ namespace Xidi
         Spherical
       };
 
-      /// Enumerates the force feedback actuators present on physical controllers.
-      enum class EActuator : uint8_t
-      {
-        /// Left motor (low-frequency rumble)
-        LeftMotor,
-
-        /// Right motor (high-frequency rumble)
-        RightMotor,
-
-        /// Left impulse trigger (embedded in LT)
-        LeftImpulseTrigger,
-
-        /// Right impulse trigger (embedded in RT)
-        RightImpulseTrigger,
-
-        /// Sentinel value, total number of enumerators
-        Count
-      };
+      /// Convenience alias for enumerating the force feedback actuators present on physical
+      /// controllers. Based on legacy usage of this name.
+      using EActuator = ::Xidi::Controller::EForceFeedbackActuator;
 
       /// Enumerates the different methods of computing a physical actuator's power state data given
       /// a force feedback magnitude component vector.
@@ -76,9 +62,9 @@ namespace Xidi
       /// Type used for all values used in internal effect-related computations.
       using TEffectValue = float;
 
-      /// Type used to represent a force feedback effect value that can be sent to a physical
-      /// actuator.
-      using TPhysicalActuatorValue = uint16_t;
+      /// Convenience alias for a type used to represent a force feedback effect value that can be
+      /// sent to a physical actuator. Based on legacy usage of this name.
+      using TPhysicalActuatorValue = ::Xidi::Controller::TForceFeedbackActuatorValue;
 
       /// Represents the magnitude of a force broken down into its per-axis components, one per
       /// element per axis associated with the force feedback effect.
@@ -162,18 +148,9 @@ namespace Xidi
           (uint8_t)EAxisDirection::Count <= 0b111,
           "Highest-valued axis direction mode does not fit into 3 bits.");
 
-      /// Represents the magnitude of a force as can be sent to physical force feedback actuators.
-      /// One element exists per possible physical force feedback actuator. Field names correspond
-      /// to the names of enumerators in #EActuator.
-      struct SPhysicalActuatorComponents
-      {
-        TPhysicalActuatorValue leftMotor;
-        TPhysicalActuatorValue rightMotor;
-        TPhysicalActuatorValue leftImpulseTrigger;
-        TPhysicalActuatorValue rightImpulseTrigger;
-
-        constexpr bool operator==(const SPhysicalActuatorComponents& other) const = default;
-      };
+      /// Convenience type alias for representing the magnitude of a force as can be sent to
+      /// physical force feedback actuators. Based on legacy usage of this name.
+      using SPhysicalActuatorComponents = ::Xidi::Controller::SForceFeedbackState;
 
       /// Minimum number of axes to which a force feedback can be applied.
       inline constexpr int kEffectAxesMinimumNumber = 1;
@@ -227,5 +204,5 @@ namespace Xidi
         return vectorResult;
       }
     } // namespace ForceFeedback
-  }   // namespace Controller
+  } // namespace Controller
 } // namespace Xidi

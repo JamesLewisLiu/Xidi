@@ -17,9 +17,9 @@
 #include "ApiDirectInput.h"
 #include "ApiGUID.h"
 #include "ControllerIdentification.h"
-#include "ControllerTypes.h"
 #include "MockDirectInput.h"
 #include "MockDirectInputDevice.h"
+#include "VirtualControllerTypes.h"
 
 namespace XidiTest
 {
@@ -228,7 +228,7 @@ namespace XidiTest
     inline EnumerationState(
         EExpectedEnumerationOrder expectedOrder,
         size_t expectedNumSystemDevices = 0,
-        size_t expectedNumXidiVirtualControllers = Controller::kPhysicalControllerCount)
+        size_t expectedNumXidiVirtualControllers = Controller::kVirtualControllerMaxCount)
         : kExpectedOrder(expectedOrder),
           kExpectedNumSystemDevices(expectedNumSystemDevices),
           kExpectedNumXidiVirtualControllers(expectedNumXidiVirtualControllers),

@@ -16,7 +16,7 @@
 
 #include <Infra/Test/TestCase.h>
 
-#include "ControllerTypes.h"
+#include "VirtualControllerTypes.h"
 
 namespace XidiTest
 {

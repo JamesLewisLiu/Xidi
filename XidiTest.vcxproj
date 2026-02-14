@@ -112,7 +112,6 @@
     <ClInclude Include="Include\Xidi\Internal\ApiXidi.h" />
     <ClInclude Include="Include\Xidi\Internal\ControllerIdentification.h" />
     <ClInclude Include="Include\Xidi\Internal\ControllerMath.h" />
-    <ClInclude Include="Include\Xidi\Internal\ControllerTypes.h" />
     <ClInclude Include="Include\Xidi\Internal\DataFormat.h" />
     <ClInclude Include="Include\Xidi\Internal\DllFunctions.h" />
     <ClInclude Include="Include\Xidi\Internal\ElementMapper.h" />
@@ -132,6 +131,8 @@
     <ClInclude Include="Include\Xidi\Internal\PhysicalController.h" />
     <ClInclude Include="Include\Xidi\Internal\StateChangeEventBuffer.h" />
     <ClInclude Include="Include\Xidi\Internal\Strings.h" />
+    <ClInclude Include="Include\Xidi\PhysicalControllerTypes.h" />
+    <ClInclude Include="Include\Xidi\Plugin.h" />
     <ClInclude Include="Include\Xidi\Test\MockDirectInput.h" />
     <ClInclude Include="Include\Xidi\Test\MockDirectInputDevice.h" />
     <ClInclude Include="Include\Xidi\Test\MockElementMapper.h" />
@@ -143,6 +144,7 @@
     <ClInclude Include="Include\Xidi\Internal\VirtualDirectInputDevice.h" />
     <ClInclude Include="Include\Xidi\Internal\VirtualDirectInputEffect.h" />
     <ClInclude Include="Include\Xidi\Internal\WrapperIDirectInput.h" />
+    <ClInclude Include="Include\Xidi\VirtualControllerTypes.h" />
     <ClInclude Include="Resources\Xidi.h" />
   </ItemGroup>
   <ItemGroup>

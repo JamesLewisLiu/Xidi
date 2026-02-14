@@ -24,10 +24,10 @@
 
 #include "ApiBitSet.h"
 #include "ApiDirectInput.h"
-#include "ControllerTypes.h"
 #include "Globals.h"
 #include "Mapper.h"
 #include "Strings.h"
+#include "VirtualControllerTypes.h"
 
 namespace Xidi
 {
@@ -325,7 +325,7 @@ namespace Xidi
   {
     std::unique_ptr<typename DirectInputTypes<diVersion>::DeviceInstanceType> instanceInfo =
         std::make_unique<typename DirectInputTypes<diVersion>::DeviceInstanceType>();
-    uint32_t numControllersToEnumerate = Controller::kPhysicalControllerCount;
+    uint32_t numControllersToEnumerate = Controller::kVirtualControllerMaxCount;
 
     const uint64_t activeVirtualControllerMask =
         Globals::GetConfigurationData()
@@ -531,7 +531,7 @@ namespace Xidi
     Controller::TControllerIdentifier xindex =
         ExtractVirtualControllerInstanceFromGuid(instanceGUID);
 
-    if (xindex < Controller::kPhysicalControllerCount)
+    if (xindex < Controller::kVirtualControllerMaxCount)
     {
       GUID realXInputGUID = VirtualControllerGuid(xindex);
       if (realXInputGUID == instanceGUID) return (Controller::TControllerIdentifier)xindex;

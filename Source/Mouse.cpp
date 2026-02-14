@@ -28,7 +28,6 @@
 
 #include "ApiBitSet.h"
 #include "ApiWindows.h"
-#include "ControllerTypes.h"
 #include "Globals.h"
 #include "Strings.h"
 

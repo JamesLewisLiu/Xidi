@@ -17,11 +17,11 @@
 
 #include "ApiDirectInput.h"
 #include "ApiGUID.h"
-#include "ControllerTypes.h"
 #include "Mapper.h"
 #include "MockForceFeedbackEffect.h"
 #include "MockPhysicalController.h"
 #include "VirtualController.h"
+#include "VirtualControllerTypes.h"
 
 namespace XidiTest
 {

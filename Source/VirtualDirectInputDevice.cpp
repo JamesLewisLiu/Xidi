@@ -26,7 +26,6 @@
 #include "ApiDirectInput.h"
 #include "ApiGUID.h"
 #include "ControllerIdentification.h"
-#include "ControllerTypes.h"
 #include "DataFormat.h"
 #include "ForceFeedbackDevice.h"
 #include "ForceFeedbackTypes.h"
@@ -34,6 +33,7 @@
 #include "PhysicalController.h"
 #include "Strings.h"
 #include "VirtualController.h"
+#include "VirtualControllerTypes.h"
 #include "VirtualDirectInputEffect.h"
 
 /// Logs a DirectInput interface method invocation and returns.

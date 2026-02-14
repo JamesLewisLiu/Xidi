@@ -19,9 +19,9 @@
 #include <optional>
 #include <vector>
 
-#include "ControllerTypes.h"
 #include "Keyboard.h"
 #include "Mouse.h"
+#include "VirtualControllerTypes.h"
 
 namespace Xidi
 {
