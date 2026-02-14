@@ -30,6 +30,7 @@
 #include "Globals.h"
 #include "ImportApiDirectInput.h"
 #include "ImportApiWinMM.h"
+#include "PhysicalController.h"
 #include "Strings.h"
 #include "VirtualController.h"
 #include "VirtualControllerTypes.h"
@@ -79,7 +80,8 @@ namespace Xidi
     /// filtering.
     static constexpr int32_t kAxisSaturation = 9250;
 
-    // Used to provide all information needed to get a list of XInput devices exposed by WinMM.
+    // Used to provide all information needed to get a list of devices exposed by WinMM that support
+    // the configured physical controller backend.
     struct SWinMMEnumCallbackInfo
     {
       std::vector<std::pair<std::wstring, bool>>* systemDeviceInfo;
@@ -90,13 +92,13 @@ namespace Xidi
     static Controller::VirtualController* controllers[Controller::kVirtualControllerMaxCount];
 
     /// Maps from application-specified joystick index to the actual indices to present to WinMM or
-    /// use internally. Negative values indicate XInput controllers, others indicate values to be
-    /// passed to WinMM as is.
+    /// use internally. Negative values indicate controllers supported by the configured physical
+    /// controller backend, others indicate values to be passed to WinMM as is.
     static std::vector<int> joyIndexMap;
 
     /// Holds information about all devices WinMM makes available.
     /// String specifies the device identifier (vendor ID and product ID string), bool value
-    /// specifies whether the device supports XInput.
+    /// specifies whether the device supports the configured physical controller backend.
     static std::vector<std::pair<std::wstring, bool>> joySystemDeviceInfo;
 
     /// Templated wrapper around the imported `joyGetDevCaps` WinMM function, which ordinarily
@@ -138,9 +140,10 @@ namespace Xidi
 
     /// Creates the joystick index map.
     /// Requires that the system device information data structure already be filled.
-    /// If the user's preferred controller is absent or supports XInput, virtual devices are
-    /// presented first, otherwise they are presented last. Any controllers that support XInput are
-    /// removed from the mapping.
+    /// If the user's preferred controller is absent or supports the configured physical controller
+    /// backend, virtual devices are presented first, otherwise they are presented last. Any
+    /// controllers that support the configured physical controller backend are removed from the
+    /// mapping.
     static void CreateJoyIndexMap(void)
     {
       const uint64_t activeVirtualControllerMask =
@@ -150,8 +153,8 @@ namespace Xidi
                   .ValueOr(UINT64_MAX);
 
       const size_t numDevicesFromSystem = joySystemDeviceInfo.size();
-      const size_t numXInputVirtualDevices = _countof(controllers);
-      const size_t numDevicesTotal = numDevicesFromSystem + numXInputVirtualDevices;
+      const size_t numVirtualDevices = _countof(controllers);
+      const size_t numDevicesTotal = numDevicesFromSystem + numVirtualDevices;
 
       // Initialize the joystick index map with conservative defaults.
       // In the event of an error, it is safest to avoid enabling any Xidi virtual controllers to
@@ -164,8 +167,9 @@ namespace Xidi
 
       if ((false == joySystemDeviceInfo[0].second) && !(joySystemDeviceInfo[0].first.empty()))
       {
-        // Preferred device is present but does not support XInput.
-        // Filter out all XInput devices, but ensure Xidi virtual controllers are mapped to the end.
+        // Preferred device is present but does not support the configured physical controller
+        // backend. Filter out all supported devices, but ensure Xidi virtual controllers are mapped
+        // to the end.
 
         for (int i = 0; i < (int)numDevicesFromSystem; ++i)
         {
@@ -180,7 +184,7 @@ namespace Xidi
           }
         }
 
-        for (int i = 0; i < (int)numXInputVirtualDevices; ++i)
+        for (int i = 0; i < (int)numVirtualDevices; ++i)
         {
           if (0 != (activeVirtualControllerMask & ((uint64_t)1 << i)))
           {
@@ -195,10 +199,10 @@ namespace Xidi
       }
       else
       {
-        // Preferred device supports XInput or is not present.
-        // Filter out all XInput devices and present Xidi virtual controllers at the start.
+        // Preferred device supports the configured physical controller backend or is not present.
+        // Filter out all supported devices and present Xidi virtual controllers at the start.
 
-        for (int i = 0; i < (int)numXInputVirtualDevices; ++i)
+        for (int i = 0; i < (int)numVirtualDevices; ++i)
         {
           if (0 != (activeVirtualControllerMask & ((uint64_t)1 << i)))
           {
@@ -226,22 +230,23 @@ namespace Xidi
       }
     }
 
-    /// Callback during DirectInput device enumeration.
-    /// Used internally to detect which WinMM devices support XInput.
+    /// Callback during DirectInput device enumeration. Used internally to detect which WinMM
+    /// devices support the configured physical controller backend.
     static BOOL __stdcall CreateSystemDeviceInfoEnumCallback(
         LPCDIDEVICEINSTANCE lpddi, LPVOID pvRef)
     {
       SWinMMEnumCallbackInfo* callbackInfo = (SWinMMEnumCallbackInfo*)pvRef;
 
       std::wstring devicePath;
-      bool deviceSupportsXInput = DoesDirectInputControllerSupportConfiguredBackend<EDirectInputVersion::k8W>(
-          callbackInfo->directInputInterface, lpddi->guidInstance, &devicePath);
+      bool deviceSupportsConfiguredBackend =
+          DoesDirectInputControllerSupportConfiguredBackend<EDirectInputVersion::k8W>(
+              callbackInfo->directInputInterface, lpddi->guidInstance, &devicePath);
 
-      if (deviceSupportsXInput)
+      if (deviceSupportsConfiguredBackend)
       {
         // For each element of the WinMM devices list, see if the vendor and product IDs match the
-        // one DirectInput presented as being compatible with XInput. If so, mark it in the list as
-        // being an XInput controller.
+        // one DirectInput presented as being compatible with the configured physical controller
+        // backend. If so, mark it in the list as being a supported controller.
         for (size_t i = 0; i < callbackInfo->systemDeviceInfo->size(); ++i)
         {
           // Already seen this device, skip.
@@ -250,8 +255,7 @@ namespace Xidi
           // No device at that position, skip.
           if (callbackInfo->systemDeviceInfo->at(i).first.empty()) continue;
 
-          // Check for a matching vendor and product ID. If so, mark the device as supporting
-          // XInput.
+          // Check for a matching vendor and product ID. If so, mark the device as supported.
           if (true ==
               ApproximatelyEqualVendorAndProductId(
                   devicePath, callbackInfo->systemDeviceInfo->at(i).first)
@@ -385,11 +389,15 @@ namespace Xidi
           Infra::Message::ESeverity::Debug, L"Done enumerating system WinMM devices.");
       RegCloseKey(registryKey);
 
-      // Enumerate all devices using DirectInput8 to find any XInput devices with matching vendor
-      // and product identifiers. This will provide information on whether each WinMM device
-      // supports XInput.
-      Infra::Message::Output(
-          Infra::Message::ESeverity::Debug, L"Using DirectInput to detect XInput devices...");
+      // Enumerate all devices using DirectInput8 to find any devices that support the configured
+      // physical controller backend with matching vendor and product identifiers. This will provide
+      // information on whether each WinMM device supports the configured physical controller
+      // backend.
+      Infra::Message::OutputFormatted(
+          Infra::Message::ESeverity::Debug,
+          L"Using DirectInput to detect devices supported by physical controller backend \"%.*s\"...",
+          static_cast<int>(Controller::GetPhysicalControllerBackendName().length()),
+          Controller::GetPhysicalControllerBackendName().data());
       IDirectInput8W* directInputInterface = nullptr;
       if (S_OK !=
           ImportApiDirectInput::Version8::DirectInput8Create(
@@ -401,7 +409,7 @@ namespace Xidi
       {
         Infra::Message::Output(
             Infra::Message::ESeverity::Debug,
-            L"Unable to detect XInput devices because a DirectInput interface object could not be created.");
+            L"Unable to detect supported devices because a DirectInput interface object could not be created.");
         return;
       }
 
@@ -414,11 +422,15 @@ namespace Xidi
       {
         Infra::Message::Output(
             Infra::Message::ESeverity::Debug,
-            L"Unable to detect XInput devices because enumeration of DirectInput devices failed.");
+            L"Unable to detect supported devices because enumeration of DirectInput devices failed.");
         return;
       }
 
-      Infra::Message::Output(Infra::Message::ESeverity::Debug, L"Done detecting XInput devices.");
+      Infra::Message::OutputFormatted(
+          Infra::Message::ESeverity::Debug,
+          L"Done detecting devices supported by physical controller backend \"%.*s\".",
+          static_cast<int>(Controller::GetPhysicalControllerBackendName().length()),
+          Controller::GetPhysicalControllerBackendName().data());
     }
 
     /// Fills in the specified buffer with the name of the registry key to use for referencing
@@ -647,7 +659,7 @@ namespace Xidi
 
       if (realJoyID < 0)
       {
-        // Querying an XInput controller.
+        // Querying a controller supported by the configured physical controller backend.
         const Controller::TControllerIdentifier xJoyID =
             (Controller::TControllerIdentifier)((-realJoyID) - 1);
 
@@ -701,7 +713,7 @@ namespace Xidi
       }
       else
       {
-        // Querying a non-XInput controller.
+        // Querying a controller not supported by the configured physical controller backend.
         // Replace the registry key but otherwise leave the response unchanged.
         MMRESULT result = ImportedJoyGetDevCaps((UINT_PTR)realJoyID, pjc, cbjc);
 
@@ -750,7 +762,7 @@ namespace Xidi
     {
       Initialize();
 
-      // Number of controllers = number of XInput controllers + number of driver-reported
+      // Number of controllers = number of virtual controllers + number of driver-reported
       // controllers.
       UINT result = (UINT)joyIndexMap.size();
       Infra::Message::OutputFormatted(
@@ -768,7 +780,7 @@ namespace Xidi
 
       if (realJoyID < 0)
       {
-        // Querying an XInput controller.
+        // Querying a controller supported by the configured physical controller backend.
         const Controller::TControllerIdentifier xJoyID =
             (Controller::TControllerIdentifier)((-realJoyID) - 1);
 
@@ -791,7 +803,7 @@ namespace Xidi
       }
       else
       {
-        // Querying a non-XInput controller.
+        // Querying a controller not supported by the configured physical controller backend.
         const MMRESULT result = ImportApiWinMM::joyGetPos((UINT)realJoyID, pji);
         LOG_INVOCATION(Infra::Message::ESeverity::SuperDebug, (unsigned int)uJoyID, result);
         return result;
@@ -805,7 +817,7 @@ namespace Xidi
 
       if (realJoyID < 0)
       {
-        // Querying an XInput controller.
+        // Querying a controller supported by the configured physical controller backend.
         const Controller::TControllerIdentifier xJoyID =
             (Controller::TControllerIdentifier)((-realJoyID) - 1);
 
@@ -848,7 +860,7 @@ namespace Xidi
       }
       else
       {
-        // Querying a non-XInput controller.
+        // Querying a controller not supported by the configured physical controller backend.
         const MMRESULT result = ImportApiWinMM::joyGetPosEx((UINT)realJoyID, pji);
         LOG_INVOCATION(Infra::Message::ESeverity::SuperDebug, (unsigned int)uJoyID, result);
         return result;
@@ -862,7 +874,7 @@ namespace Xidi
 
       if (realJoyID < 0)
       {
-        // Querying an XInput controller.
+        // Querying a controller supported by the configured physical controller backend.
 
         // Operation not supported.
         const MMRESULT result = JOYERR_NOCANDO;
@@ -872,7 +884,7 @@ namespace Xidi
       }
       else
       {
-        // Querying a non-XInput controller.
+        // Querying a controller not supported by the configured physical controller backend.
         const MMRESULT result = ImportApiWinMM::joyGetThreshold((UINT)realJoyID, puThreshold);
         LOG_INVOCATION(Infra::Message::ESeverity::Info, (unsigned int)uJoyID, result);
         return result;
@@ -886,7 +898,7 @@ namespace Xidi
 
       if (realJoyID < 0)
       {
-        // Querying an XInput controller.
+        // Querying a controller supported by the configured physical controller backend.
 
         // Operation not supported.
         const MMRESULT result = JOYERR_NOCANDO;
@@ -896,7 +908,7 @@ namespace Xidi
       }
       else
       {
-        // Querying a non-XInput controller.
+        // Querying a controller not supported by the configured physical controller backend.
         const MMRESULT result = ImportApiWinMM::joyReleaseCapture((UINT)realJoyID);
         LOG_INVOCATION(Infra::Message::ESeverity::Info, (unsigned int)uJoyID, result);
         return result;
@@ -910,7 +922,7 @@ namespace Xidi
 
       if (realJoyID < 0)
       {
-        // Querying an XInput controller.
+        // Querying a controller supported by the configured physical controller backend.
 
         // Operation not supported.
         const MMRESULT result = JOYERR_NOCANDO;
@@ -920,7 +932,7 @@ namespace Xidi
       }
       else
       {
-        // Querying a non-XInput controller.
+        // Querying a controller not supported by the configured physical controller backend.
         const MMRESULT result =
             ImportApiWinMM::joySetCapture(hwnd, (UINT)realJoyID, uPeriod, fChanged);
         LOG_INVOCATION(Infra::Message::ESeverity::Info, (unsigned int)uJoyID, result);
@@ -935,7 +947,7 @@ namespace Xidi
 
       if (realJoyID < 0)
       {
-        // Querying an XInput controller.
+        // Querying a controller supported by the configured physical controller backend.
 
         // Operation not supported.
         const MMRESULT result = JOYERR_NOCANDO;
@@ -945,7 +957,7 @@ namespace Xidi
       }
       else
       {
-        // Querying a non-XInput controller.
+        // Querying a controller not supported by the configured physical controller backend.
         const MMRESULT result = ImportApiWinMM::joySetThreshold((UINT)realJoyID, uThreshold);
         LOG_INVOCATION(Infra::Message::ESeverity::Info, (unsigned int)uJoyID, result);
         return result;

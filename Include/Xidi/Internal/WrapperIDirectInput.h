@@ -26,8 +26,9 @@ namespace Xidi
 
     WrapperIDirectInputBase(DirectInputTypes<diVersion>::IDirectInputType* underlyingDIObject);
 
-    /// Callback used to scan for any XInput-compatible game controllers.
-    static BOOL __stdcall CallbackEnumGameControllersXInputScan(
+    /// Callback used to scan for any game controllers supported by the configured physical
+    /// controller backend.
+    static BOOL __stdcall CallbackEnumGameControllersSupportedDeviceScan(
         const DirectInputTypes<diVersion>::DeviceInstanceType* lpddi, LPVOID pvRef);
 
     /// Callback used to enumerate all devices to the application, filtering out those already seen.

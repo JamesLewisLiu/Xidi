@@ -24,6 +24,8 @@
 #include "ApiGUID.h"
 #include "ControllerIdentification.h"
 #include "Mapper.h"
+#include "PhysicalController.h"
+#include "PhysicalControllerBackend.h"
 #include "Strings.h"
 #include "VirtualController.h"
 #include "VirtualDirectInputDevice.h"
@@ -132,17 +134,20 @@ namespace Xidi
               .dwSize = sizeof(typename DirectInputTypes<diVersion>::DeviceInstanceType)};
           const HRESULT deviceInfoResult = createdDevice->GetDeviceInfo(&deviceInfo);
 
-          const bool deviceSupportsXInput =
-              DoesDirectInputControllerSupportConfiguredBackend<diVersion>(underlyingDIObject, rguid);
-          if (true == deviceSupportsXInput)
+          const bool deviceSupportsConfiguredBackend =
+              DoesDirectInputControllerSupportConfiguredBackend<diVersion>(
+                  underlyingDIObject, rguid);
+          if (true == deviceSupportsConfiguredBackend)
           {
             if (Infra::Message::WillOutputMessageOfSeverity(Infra::Message::ESeverity::Info))
             {
               Infra::Message::OutputFormatted(
                   Infra::Message::ESeverity::Info,
-                  L"Attempting to bind directly to XInput device \"%s\" with instance GUID %s. Xidi hides XInput devices and therefore is rejecting this request.",
+                  L"Attempting to bind directly to supported device \"%s\" with instance GUID %s. Xidi hides devices supported by physical controller backend \"%.*s\" and therefore is rejecting this request.",
                   Infra::TemporaryString(deviceInfo.tszProductName).AsCString(),
-                  Strings::GuidToString(deviceInfo.guidInstance).AsCString());
+                  Strings::GuidToString(deviceInfo.guidInstance).AsCString(),
+                  static_cast<int>(Controller::GetPhysicalControllerBackendName().length()),
+                  Controller::GetPhysicalControllerBackendName().data());
             }
             createdDevice->Release();
             return DIERR_DEVICENOTREG;
@@ -154,15 +159,17 @@ namespace Xidi
             {
               Infra::Message::OutputFormatted(
                   Infra::Message::ESeverity::Info,
-                  L"Binding to non-XInput device \"%s\" with instance GUID %s. Xidi will not handle communication with it.",
+                  L"Binding to device \"%s\" with instance GUID %s, which is not supported by physical controller backend \"%.*s\". Xidi will not handle communication with it.",
                   Infra::TemporaryString(deviceInfo.tszProductName).AsCString(),
-                  Strings::GuidToString(deviceInfo.guidInstance).AsCString());
+                  Strings::GuidToString(deviceInfo.guidInstance).AsCString(),
+                  static_cast<int>(Controller::GetPhysicalControllerBackendName().length()),
+                  Controller::GetPhysicalControllerBackendName().data());
             }
             else
             {
               Infra::Message::OutputFormatted(
                   Infra::Message::ESeverity::Info,
-                  L"Binding to an unknown non-XInput device with instance GUID %s. Xidi will not handle communication with it.",
+                  L"Binding to an unknown device with instance GUID %s. Xidi will not handle communication with it.",
                   Strings::GuidToString(deviceInfo.guidInstance).AsCString());
             }
           }
@@ -172,8 +179,10 @@ namespace Xidi
       {
         Infra::Message::OutputFormatted(
             Infra::Message::ESeverity::Info,
-            L"Failed (result = 0x%08x) to bind to a non-XInput device.",
-            static_cast<unsigned int>(createDeviceResult));
+            L"Failed (result = 0x%08x) to bind to a device unsupported by physical controller backend \"%.*s\".",
+            static_cast<unsigned int>(createDeviceResult),
+            static_cast<int>(Controller::GetPhysicalControllerBackendName().length()),
+            Controller::GetPhysicalControllerBackendName().data());
       }
 
       if (nullptr != createdDevice) *lplpDirectInputDevice = createdDevice;
@@ -238,32 +247,37 @@ namespace Xidi
     // Enumerating game controllers requires some manipulation.
     if (gameControllersRequested)
     {
-      // First scan the system for any XInput-compatible game controllers that match the enumeration
-      // request. In general, XInput devices enumerated via DirectInput do not report supporting
-      // force feedback, even though Xidi does implement such support. For this reason any filtering
-      // by force feedback support must be removed while using the system-supplied interfaces to
-      // scan for XInput devices.
+      // First scan the system for any game controllers supported by the configured physical
+      // controller backend that also match the enumeration request. Such devices, when enumerated
+      // via DirectInput, do not report supporting force feedback, even though Xidi does implement
+      // such support. For this reason any filtering by force feedback support must be removed while
+      // using the system-supplied interfaces to scan for supported devices.
       enumResult = underlyingDIObject->EnumDevices(
           dwDevType,
-          &WrapperIDirectInputBase<diVersion>::CallbackEnumGameControllersXInputScan,
+          &WrapperIDirectInputBase<diVersion>::CallbackEnumGameControllersSupportedDeviceScan,
           (LPVOID)&callbackInfo,
           (dwFlags & ~(DIEDFL_FORCEFEEDBACK)));
       if (DI_OK != enumResult) return enumResult;
 
-      const BOOL systemHasXInputDevices = (0 != callbackInfo.seenInstanceIdentifiers.size());
+      const BOOL systemHasSupportedDevices = (0 != callbackInfo.seenInstanceIdentifiers.size());
 
-      if (systemHasXInputDevices)
-        Infra::Message::Output(
+      if (systemHasSupportedDevices)
+        Infra::Message::OutputFormatted(
             Infra::Message::ESeverity::Debug,
-            L"Enumerate: System has XInput devices, so Xidi virtual controllers are being presented to the application before other controllers.");
+            L"Enumerate: System has devices supported by physical controller backend \"%.*s\", so Xidi virtual controllers are being presented to the application before other controllers.",
+            static_cast<int>(Controller::GetPhysicalControllerBackendName().length()),
+            Controller::GetPhysicalControllerBackendName().data());
       else
-        Infra::Message::Output(
+        Infra::Message::OutputFormatted(
             Infra::Message::ESeverity::Debug,
-            L"Enumerate: System has no XInput devices, so Xidi virtual controllers are being presented to the application after other controllers.");
+            L"Enumerate: System has no devices supported by physical controller backend \"%.*s\", so Xidi virtual controllers are being presented to the application after other controllers.",
+            static_cast<int>(Controller::GetPhysicalControllerBackendName().length()),
+            Controller::GetPhysicalControllerBackendName().data());
 
-      // Second, if the system has XInput controllers, enumerate them.
-      // These will be the first controllers seen by the application.
-      if (systemHasXInputDevices)
+      // Second, if the system has controllers supported by the configured physical controller
+      // backend, enumerate the virtual controllers now. These will be the first controllers seen by
+      // the application.
+      if (systemHasSupportedDevices)
       {
         callbackInfo.callbackReturnCode =
             EnumerateVirtualControllers<diVersion>(lpCallback, pvRef, forceFeedbackControllersOnly);
@@ -276,7 +290,8 @@ namespace Xidi
         }
       }
 
-      // Third, enumerate all other game controllers, filtering out those that support XInput.
+      // Third, enumerate all other game controllers, filtering out those that are supported by the
+      // configured physical controller backend.
       enumResult = underlyingDIObject->EnumDevices(
           gameControllerDevClass, &CallbackEnumDevicesFiltered, (LPVOID)&callbackInfo, dwFlags);
 
@@ -289,9 +304,10 @@ namespace Xidi
         return enumResult;
       }
 
-      // Finally, if the system did not have any XInput controllers, enumerate them anyway.
-      // These will be the last controllers seen by the application.
-      if (!systemHasXInputDevices)
+      // Finally, if the system did not have any controllers supported by the configured physical
+      // controller backend, enumerate the virtual controllers now. These will be the last
+      // controllers seen by the application.
+      if (!systemHasSupportedDevices)
       {
         callbackInfo.callbackReturnCode =
             EnumerateVirtualControllers<diVersion>(lpCallback, pvRef, forceFeedbackControllersOnly);
@@ -364,7 +380,7 @@ namespace Xidi
   }
 
   template <EDirectInputVersion diVersion> BOOL __stdcall WrapperIDirectInputBase<diVersion>::
-      CallbackEnumGameControllersXInputScan(
+      CallbackEnumGameControllersSupportedDeviceScan(
           const DirectInputTypes<diVersion>::DeviceInstanceType* lpddi, LPVOID pvRef)
   {
     SEnumDevicesCallbackInfo<diVersion>* callbackInfo = (SEnumDevicesCallbackInfo<diVersion>*)pvRef;
@@ -379,9 +395,11 @@ namespace Xidi
       {
         Infra::Message::OutputFormatted(
             Infra::Message::ESeverity::Debug,
-            L"Enumerate: DirectInput device \"%s\" with instance GUID %s supports XInput and will not be presented to the application.",
+            L"Enumerate: DirectInput device \"%s\" with instance GUID %s supports physical controller backend \"%.*s\" and will not be presented to the application.",
             Infra::TemporaryString(lpddi->tszProductName).AsCString(),
-            Strings::GuidToString(lpddi->guidInstance).AsCString());
+            Strings::GuidToString(lpddi->guidInstance).AsCString(),
+            static_cast<int>(Controller::GetPhysicalControllerBackendName().length()),
+            Controller::GetPhysicalControllerBackendName().data());
       }
     }
     else
@@ -390,9 +408,11 @@ namespace Xidi
       {
         Infra::Message::OutputFormatted(
             Infra::Message::ESeverity::Debug,
-            L"Enumerate: DirectInput device \"%s\" with instance GUID %s does not support XInput and may be presented to the application.",
+            L"Enumerate: DirectInput device \"%s\" with instance GUID %s does not support physical controller backend \"%.*s\" and may be presented to the application.",
             Infra::TemporaryString(lpddi->tszProductName).AsCString(),
-            Strings::GuidToString(lpddi->guidInstance).AsCString());
+            Strings::GuidToString(lpddi->guidInstance).AsCString(),
+            static_cast<int>(Controller::GetPhysicalControllerBackendName().length()),
+            Controller::GetPhysicalControllerBackendName().data());
       }
     }
 
