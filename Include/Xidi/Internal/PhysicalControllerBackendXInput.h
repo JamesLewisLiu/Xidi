@@ -5,20 +5,18 @@
  * Authored by Samuel Grossman
  * Copyright (c) 2016-2026
  ***********************************************************************************************//**
- * @file BackendXInput.h
+ * @file PhysicalControllerBackendXInput.h
  *   Declaration of the built-in XInput physical controller backend.
  **************************************************************************************************/
 
 #pragma once
 
-#include "Plugin.h"
+#include "PhysicalControllerBackend.h"
 
 namespace Xidi
 {
-  using namespace ::Xidi::Plugin;
-
   /// Implements the built-in XInput backend for communicating with physical controllers.
-  class BackendXInput : public IPhysicalControllerBackend
+  class PhysicalControllerBackendXInput : public IPhysicalControllerBackend
   {
   public:
 

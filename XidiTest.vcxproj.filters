@@ -132,7 +132,7 @@
     <ClInclude Include="Include\Xidi\VirtualControllerTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Xidi\Plugin.h">
+    <ClInclude Include="Include\Xidi\PhysicalControllerBackend.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

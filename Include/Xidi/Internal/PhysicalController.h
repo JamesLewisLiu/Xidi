@@ -12,9 +12,11 @@
 #pragma once
 
 #include <stop_token>
+#include <string_view>
 
 #include "ApiWindows.h"
 #include "ForceFeedbackDevice.h"
+#include "PhysicalControllerBackend.h"
 #include "PhysicalControllerTypes.h"
 #include "VirtualController.h"
 #include "VirtualControllerTypes.h"
@@ -33,11 +35,20 @@ namespace Xidi
     /// the last attempt resulted in an error, such as the controller being disconnected.
     inline constexpr unsigned int kPhysicalErrorBackoffPeriodMilliseconds = 100;
 
-    /// Retrieves and returns the capabilities of the controller layout implemented by the mapper
-    /// associated with the specified physical controller. Controller capabilities act as metadata
-    /// that are used internally and can be presented to applications. Concurrency-safe.
+    /// Retrieves and returns an interface pointer for the configured physical controller backend.
+    /// @return Interface pointer for the configured physical controller backend.
+    IPhysicalControllerBackend* GetPhysicalControllerBackend(void);
+
+    /// Retrieves and returns the name of the configured physical controller backend. This is
+    /// generally useful only for logging purposes.
+    /// @return Name of the configured physical controller backend.
+    std::wstring_view GetPhysicalControllerBackendName(void);
+
+    /// Retrieves and returns the capabilities of the virtual controller layout implemented by the
+    /// mapper associated with the specified physical controller. Controller capabilities act as
+    /// metadata that are used internally and can be presented to applications. Concurrency-safe.
     /// @return Capabilities associated with the specified physical controller.
-    SCapabilities GetControllerCapabilities(TControllerIdentifier controllerIdentifier);
+    SCapabilities GetVirtualControllerCapabilities(TControllerIdentifier controllerIdentifier);
 
     /// Retrieves the instantaneous physical state of the specified controller. Concurrency-safe.
     /// @param [in] controllerIdentifier Identifier of the physical controller of interest.

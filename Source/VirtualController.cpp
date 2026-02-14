@@ -251,7 +251,7 @@ namespace Xidi
 
     SCapabilities VirtualController::GetCapabilities(void) const
     {
-      return GetControllerCapabilities(kControllerIdentifier);
+      return GetVirtualControllerCapabilities(kControllerIdentifier);
     }
 
     SState VirtualController::GetState(void)

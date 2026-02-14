@@ -14,6 +14,7 @@
 
 #include <shared_mutex>
 #include <stop_token>
+#include <string>
 #include <vector>
 
 #include <Infra/Test/TestCase.h>
@@ -22,6 +23,7 @@
 #include "ForceFeedbackDevice.h"
 #include "Mapper.h"
 #include "PhysicalController.h"
+#include "PhysicalControllerTypes.h"
 #include "VirtualController.h"
 
 namespace XidiTest
@@ -88,7 +90,7 @@ namespace XidiTest
     advanceRequested = false;
   }
 
-  SCapabilities MockPhysicalController::GetControllerCapabilities(void) const
+  SCapabilities MockPhysicalController::GetVirtualControllerCapabilities(void) const
   {
     return mapper.GetCapabilities();
   }
@@ -131,7 +133,67 @@ namespace Xidi
   {
     using namespace ::XidiTest;
 
-    SCapabilities GetControllerCapabilities(TControllerIdentifier controllerIdentifier)
+    class FakePhysicalControllerBackend : public IPhysicalControllerBackend
+    {
+    public:
+
+      // IPhysicalControllerBackend
+      void Initialize(void) override {}
+
+      TPhysicalControllerIndex MaxPhysicalControllerCount(void) override
+      {
+        // Hard-coded for testing.
+        return 4;
+      }
+
+      bool SupportsControllerByGuidAndPath(const wchar_t* guidAndPath) override
+      {
+        // This is the same check as the real XInput controller backend uses.
+        return (nullptr != wcsstr(guidAndPath, L"&IG_") || nullptr != wcsstr(guidAndPath, L"&ig_"));
+      }
+
+      SPhysicalControllerCapabilities GetCapabilities(void) override
+      {
+        // These are the same capabilities as the real XInput controller backend uses.
+        return {
+            .stick = kPhysicalCapabilitiesAllAnalogSticks,
+            .trigger = kPhysicalCapabilitiesAllAnalogTriggers,
+            .button = kPhysicalCapabilitiesStandardXInputButtons,
+            .forceFeedbackActuator = kPhysicalCapabilitiesStandardXInputForceFeedbackActuators};
+      }
+
+      SPhysicalControllerState ReadInputState(
+          TPhysicalControllerIndex physicalControllerIndex) override
+      {
+        // Simply returns whether or not the device is connected.
+        return {
+            .deviceStatus =
+                ((nullptr != mockPhysicalController[physicalControllerIndex])
+                     ? EPhysicalDeviceStatus::Ok
+                     : EPhysicalDeviceStatus::NotConnected)};
+      }
+
+      bool WriteForceFeedbackState(
+          TPhysicalControllerIndex physicalControllerIndex,
+          SPhysicalControllerVibration vibrationState) override
+      {
+        // Succeeds if the device is connected, fails otherwise.
+        return (nullptr != mockPhysicalController[physicalControllerIndex]);
+      }
+    };
+
+    IPhysicalControllerBackend* GetPhysicalControllerBackend(void)
+    {
+      static FakePhysicalControllerBackend fakeBackend;
+      return &fakeBackend;
+    }
+
+    std::wstring_view GetPhysicalControllerBackendName(void)
+    {
+      return L"XInput (fake, for testing)";
+    }
+
+    SCapabilities GetVirtualControllerCapabilities(TControllerIdentifier controllerIdentifier)
     {
       if (controllerIdentifier >= kVirtualControllerMaxCount)
         TEST_FAILED_BECAUSE(
@@ -140,7 +202,7 @@ namespace Xidi
       std::shared_lock lock(mockPhysicalStateGuard[controllerIdentifier]);
 
       if (nullptr != mockPhysicalController[controllerIdentifier])
-        return mockPhysicalController[controllerIdentifier]->GetControllerCapabilities();
+        return mockPhysicalController[controllerIdentifier]->GetVirtualControllerCapabilities();
       else
         TEST_FAILED_BECAUSE(
             L"%s: No mock physical controller associated with identifier %u.",

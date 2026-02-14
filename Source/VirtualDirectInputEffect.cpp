@@ -201,10 +201,11 @@ namespace Xidi
     return std::nullopt;
   }
 
-  template <EDirectInputVersion diVersion> VirtualDirectInputEffect<diVersion>::VirtualDirectInputEffect(
-      VirtualDirectInputDeviceBase<diVersion>& associatedDevice,
-      const Controller::ForceFeedback::Effect& effect,
-      const GUID& effectGuid)
+  template <EDirectInputVersion diVersion> VirtualDirectInputEffect<diVersion>::
+      VirtualDirectInputEffect(
+          VirtualDirectInputDeviceBase<diVersion>& associatedDevice,
+          const Controller::ForceFeedback::Effect& effect,
+          const GUID& effectGuid)
       : associatedDevice(associatedDevice),
         effect(effect.Clone()),
         effectGuid(effectGuid),
@@ -214,7 +215,8 @@ namespace Xidi
     associatedDevice.ForceFeedbackEffectRegister((void*)this);
   }
 
-  template <EDirectInputVersion diVersion> VirtualDirectInputEffect<diVersion>::~VirtualDirectInputEffect(void)
+  template <EDirectInputVersion diVersion> VirtualDirectInputEffect<
+      diVersion>::~VirtualDirectInputEffect(void)
   {
     // If the effect represented by this object is already downloaded to a device then it must be
     // removed from that device.
@@ -226,7 +228,8 @@ namespace Xidi
     associatedDevice.Release();
   }
 
-  template <EDirectInputVersion diVersion> HRESULT VirtualDirectInputEffect<diVersion>::DownloadInternal(void)
+  template <EDirectInputVersion diVersion> HRESULT
+      VirtualDirectInputEffect<diVersion>::DownloadInternal(void)
   {
     Controller::ForceFeedback::Device* const forceFeedbackDevice =
         associatedDevice.AutoAcquireAndGetForceFeedbackDevice();
@@ -235,8 +238,9 @@ namespace Xidi
     return DownloadEffectToDevice(*effect, *forceFeedbackDevice);
   }
 
-  template <EDirectInputVersion diVersion> void VirtualDirectInputEffect<diVersion>::DumpEffectParameters(
-      LPCDIEFFECT peff, DWORD dwFlags) const
+  template <EDirectInputVersion diVersion> void
+      VirtualDirectInputEffect<diVersion>::DumpEffectParameters(
+          LPCDIEFFECT peff, DWORD dwFlags) const
   {
     if (Infra::Message::WillOutputMessageOfSeverity(kDumpSeverity))
     {
@@ -415,10 +419,11 @@ namespace Xidi
     }
   }
 
-  template <EDirectInputVersion diVersion> HRESULT VirtualDirectInputEffect<diVersion>::SetParametersInternal(
-      LPCDIEFFECT peff,
-      DWORD dwFlags,
-      std::optional<Controller::ForceFeedback::TEffectTimeMs> timestamp)
+  template <EDirectInputVersion diVersion> HRESULT
+      VirtualDirectInputEffect<diVersion>::SetParametersInternal(
+          LPCDIEFFECT peff,
+          DWORD dwFlags,
+          std::optional<Controller::ForceFeedback::TEffectTimeMs> timestamp)
   {
     DumpEffectParameters(peff, dwFlags);
 
@@ -677,10 +682,11 @@ namespace Xidi
     return DI_OK;
   }
 
-  template <EDirectInputVersion diVersion> HRESULT VirtualDirectInputEffect<diVersion>::StartInternal(
-      DWORD dwIterations,
-      DWORD dwFlags,
-      std::optional<Controller::ForceFeedback::TEffectTimeMs> timestamp)
+  template <EDirectInputVersion diVersion> HRESULT
+      VirtualDirectInputEffect<diVersion>::StartInternal(
+          DWORD dwIterations,
+          DWORD dwFlags,
+          std::optional<Controller::ForceFeedback::TEffectTimeMs> timestamp)
   {
     if (0 == dwIterations) return DIERR_INVALIDPARAM;
 
@@ -724,8 +730,8 @@ namespace Xidi
     return DI_OK;
   }
 
-  template <EDirectInputVersion diVersion> void VirtualDirectInputEffect<diVersion>::DumpTypeSpecificParameters(
-      LPCDIEFFECT peff) const
+  template <EDirectInputVersion diVersion> void
+      VirtualDirectInputEffect<diVersion>::DumpTypeSpecificParameters(LPCDIEFFECT peff) const
   {
     Infra::Message::OutputFormatted(
         kDumpSeverity, L"    cbTypeSpecificParams = %u (unknown)", peff->cbTypeSpecificParams);
@@ -805,8 +811,8 @@ namespace Xidi
     }
   }
 
-  template <EDirectInputVersion diVersion> HRESULT VirtualDirectInputEffect<diVersion>::QueryInterface(
-      REFIID riid, LPVOID* ppvObj)
+  template <EDirectInputVersion diVersion> HRESULT
+      VirtualDirectInputEffect<diVersion>::QueryInterface(REFIID riid, LPVOID* ppvObj)
   {
     if (nullptr == ppvObj) return E_POINTER;
 
@@ -849,8 +855,8 @@ namespace Xidi
     LOG_INVOCATION_AND_RETURN(DI_OK, kMethodSeverity);
   }
 
-  template <EDirectInputVersion diVersion> HRESULT VirtualDirectInputEffect<diVersion>::GetEffectGuid(
-      LPGUID pguid)
+  template <EDirectInputVersion diVersion> HRESULT
+      VirtualDirectInputEffect<diVersion>::GetEffectGuid(LPGUID pguid)
   {
     constexpr Infra::Message::ESeverity kMethodSeverity = Infra::Message::ESeverity::Info;
 
@@ -860,8 +866,8 @@ namespace Xidi
     LOG_INVOCATION_AND_RETURN(DI_OK, kMethodSeverity);
   }
 
-  template <EDirectInputVersion diVersion> HRESULT VirtualDirectInputEffect<diVersion>::GetParameters(
-      LPDIEFFECT peff, DWORD dwFlags)
+  template <EDirectInputVersion diVersion> HRESULT
+      VirtualDirectInputEffect<diVersion>::GetParameters(LPDIEFFECT peff, DWORD dwFlags)
   {
     constexpr Infra::Message::ESeverity kMethodSeverity = Infra::Message::ESeverity::Info;
 
@@ -1083,8 +1089,8 @@ namespace Xidi
     LOG_INVOCATION_AND_RETURN(overallResult, kMethodSeverity);
   }
 
-  template <EDirectInputVersion diVersion> HRESULT VirtualDirectInputEffect<diVersion>::SetParameters(
-      LPCDIEFFECT peff, DWORD dwFlags)
+  template <EDirectInputVersion diVersion> HRESULT
+      VirtualDirectInputEffect<diVersion>::SetParameters(LPCDIEFFECT peff, DWORD dwFlags)
   {
     constexpr Infra::Message::ESeverity kMethodSeverity = Infra::Message::ESeverity::Info;
     LOG_INVOCATION_AND_RETURN(SetParametersInternal(peff, dwFlags), kMethodSeverity);
@@ -1110,8 +1116,8 @@ namespace Xidi
     LOG_INVOCATION_AND_RETURN(DI_OK, kMethodSeverity);
   }
 
-  template <EDirectInputVersion diVersion> HRESULT VirtualDirectInputEffect<diVersion>::GetEffectStatus(
-      LPDWORD pdwFlags)
+  template <EDirectInputVersion diVersion> HRESULT
+      VirtualDirectInputEffect<diVersion>::GetEffectStatus(LPDWORD pdwFlags)
   {
     constexpr Infra::Message::ESeverity kMethodSeverity = Infra::Message::ESeverity::Info;
 
@@ -1129,7 +1135,8 @@ namespace Xidi
     LOG_INVOCATION_AND_RETURN(DI_OK, kMethodSeverity);
   }
 
-  template <EDirectInputVersion diVersion> HRESULT VirtualDirectInputEffect<diVersion>::Download(void)
+  template <EDirectInputVersion diVersion> HRESULT VirtualDirectInputEffect<diVersion>::Download(
+      void)
   {
     constexpr Infra::Message::ESeverity kMethodSeverity = Infra::Message::ESeverity::Info;
     LOG_INVOCATION_AND_RETURN(DownloadInternal(), kMethodSeverity);

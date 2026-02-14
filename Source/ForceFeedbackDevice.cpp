@@ -197,5 +197,5 @@ namespace Xidi
         return false;
       }
     } // namespace ForceFeedback
-  }   // namespace Controller
+  } // namespace Controller
 } // namespace Xidi

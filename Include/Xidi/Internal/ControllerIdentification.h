@@ -78,9 +78,8 @@ namespace Xidi
   std::optional<Controller::SElementIdentifier> ControllerElementFromHidUsageData(
       SHidUsageData hidUsageData);
 
-  /// Returns TRUE if the specified DirectInput controller supports XInput, FALSE if not or this
-  /// information could not be determined. Determines if the specified DirectInput controller
-  /// supports XInput. In so doing, an interface object is created to communicate with the
+  /// Determines if the specified DirectInput controller is supported by the configured physical
+  /// controller backend. In so doing, an interface object is created to communicate with the
   /// controller. This interface object is released prior to returning from this method.
   /// @tparam diVersion DirectInput version enumerator.
   /// @param [in] dicontext IDirectInput context from which the controller is to be obtained.
@@ -88,8 +87,9 @@ namespace Xidi
   /// from the IDirectInput context.
   /// @param [out] devicePath If present, will be filled with the device identifying path, which was
   /// used to determine whether or not the controller supports XInput.
-  /// @return `true` if the controller supports XInput, `false` otherwise.
-  template <EDirectInputVersion diVersion> bool DoesDirectInputControllerSupportXInput(
+  /// @return `true` if the configured physical controller backend supports the controller, `false`
+  /// if not or if this information could not be determined.
+  template <EDirectInputVersion diVersion> bool DoesDirectInputControllerSupportConfiguredBackend(
       typename DirectInputTypes<diVersion>::IDirectInputCompatType* dicontext,
       REFGUID instanceGUID,
       std::wstring* devicePath = nullptr);

@@ -34,7 +34,7 @@ namespace Xidi
       HRESULT __stdcall Version8DllCanUnloadNow(void);
       HRESULT __stdcall VersionLegacyDllCanUnloadNow(void);
       HRESULT __stdcall Version8DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID* ppv);
-      
+
       HRESULT __stdcall VersionLegacyDllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID* ppv);
     }
   } // namespace ExportApiDirectInput

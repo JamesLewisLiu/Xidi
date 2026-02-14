@@ -5,11 +5,11 @@
  * Authored by Samuel Grossman
  * Copyright (c) 2016-2026
  ***********************************************************************************************//**
- * @file BackendXInput.cpp
+ * @file PhysicalControllerBackendXInput.cpp
  *   Implementation of the built-in XInput physical controller backend.
  **************************************************************************************************/
 
-#include "BackendXInput.h"
+#include "PhysicalControllerBackendXInput.h"
 
 #include <cstring>
 
@@ -20,24 +20,24 @@ namespace Xidi
 {
   using namespace ::Xidi::Controller;
 
-  void BackendXInput::Initialize(void)
+  void PhysicalControllerBackendXInput::Initialize(void)
   {
     ImportApiXInput::Initialize();
   }
 
-  TPhysicalControllerIndex BackendXInput::MaxPhysicalControllerCount(void)
+  TPhysicalControllerIndex PhysicalControllerBackendXInput::MaxPhysicalControllerCount(void)
   {
     return static_cast<TPhysicalControllerIndex>(ImportApiXInput::kMaxControllerCount);
   }
 
-  bool BackendXInput::SupportsControllerByGuidAndPath(const wchar_t* guidAndPath)
+  bool PhysicalControllerBackendXInput::SupportsControllerByGuidAndPath(const wchar_t* guidAndPath)
   {
     // The documented "best" way of determining if a device supports XInput is to look for
     // "&IG_" in the device path string.
     return (nullptr != wcsstr(guidAndPath, L"&IG_") || nullptr != wcsstr(guidAndPath, L"&ig_"));
   }
 
-  SPhysicalControllerCapabilities BackendXInput::GetCapabilities(void)
+  SPhysicalControllerCapabilities PhysicalControllerBackendXInput::GetCapabilities(void)
   {
     return {
         .stick = kPhysicalCapabilitiesAllAnalogSticks,
@@ -46,7 +46,7 @@ namespace Xidi
         .forceFeedbackActuator = kPhysicalCapabilitiesStandardXInputForceFeedbackActuators};
   }
 
-  SPhysicalControllerState BackendXInput::ReadInputState(
+  SPhysicalControllerState PhysicalControllerBackendXInput::ReadInputState(
       TPhysicalControllerIndex physicalControllerIndex)
   {
     constexpr uint16_t kUnusedButtonMask = ~(static_cast<uint16_t>(
@@ -81,10 +81,9 @@ namespace Xidi
     }
   }
 
-  bool BackendXInput::WriteForceFeedbackState(
+  bool PhysicalControllerBackendXInput::WriteForceFeedbackState(
       TPhysicalControllerIndex physicalControllerIndex, SPhysicalControllerVibration vibrationState)
   {
-    // Impulse triggers are ignored because the XInput API does not support them.
     XINPUT_VIBRATION xinputVibration = {
         .wLeftMotorSpeed = vibrationState.leftMotor, .wRightMotorSpeed = vibrationState.rightMotor};
     return (

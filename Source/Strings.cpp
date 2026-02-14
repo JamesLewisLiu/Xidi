@@ -256,7 +256,8 @@ namespace Xidi
             }
           });
 
-      if (controllerIdentifier >= Controller::kVirtualControllerMaxCount) return std::wstring_view();
+      if (controllerIdentifier >= Controller::kVirtualControllerMaxCount)
+        return std::wstring_view();
 
       return initStrings[controllerIdentifier];
     }

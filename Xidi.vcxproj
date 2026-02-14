@@ -121,7 +121,6 @@
     <ClInclude Include="Include\Xidi\Internal\ApiGUID.h" />
     <ClInclude Include="Include\Xidi\Internal\ApiWindows.h" />
     <ClInclude Include="Include\Xidi\Internal\ApiXidi.h" />
-    <ClInclude Include="Include\Xidi\Internal\BackendXInput.h" />
     <ClInclude Include="Include\Xidi\Internal\ConcurrencyWrapper.h" />
     <ClInclude Include="Include\Xidi\Internal\ControllerIdentification.h" />
     <ClInclude Include="Include\Xidi\Internal\ControllerMath.h" />
@@ -145,6 +144,7 @@
     <ClInclude Include="Include\Xidi\Internal\MapperParser.h" />
     <ClInclude Include="Include\Xidi\Internal\Mouse.h" />
     <ClInclude Include="Include\Xidi\Internal\PhysicalController.h" />
+    <ClInclude Include="Include\Xidi\Internal\PhysicalControllerBackendXInput.h" />
     <ClInclude Include="Include\Xidi\Internal\StateChangeEventBuffer.h" />
     <ClInclude Include="Include\Xidi\Internal\Strings.h" />
     <ClInclude Include="Include\Xidi\Internal\VirtualController.h" />
@@ -153,8 +153,8 @@
     <ClInclude Include="Include\Xidi\Internal\WrapperIDirectInput.h" />
     <ClInclude Include="Include\Xidi\Internal\WrapperJoyWinMM.h" />
     <ClInclude Include="Include\Xidi\Internal\XidiConfigReader.h" />
+    <ClInclude Include="Include\Xidi\PhysicalControllerBackend.h" />
     <ClInclude Include="Include\Xidi\PhysicalControllerTypes.h" />
-    <ClInclude Include="Include\Xidi\Plugin.h" />
     <ClInclude Include="Include\Xidi\VirtualControllerTypes.h" />
     <ClInclude Include="Resources\Xidi.h" />
   </ItemGroup>
@@ -164,7 +164,6 @@
     <ClCompile Include="Source\ApiXidi.cpp" />
     <ClCompile Include="Source\ApiXidiImportFunctions2.cpp" />
     <ClCompile Include="Source\ApiXidiMetadata.cpp" />
-    <ClCompile Include="Source\BackendXInput.cpp" />
     <ClCompile Include="Source\ControllerIdentification.cpp" />
     <ClCompile Include="Source\ControllerMath.cpp" />
     <ClCompile Include="Source\DataFormat.cpp" />
@@ -187,6 +186,7 @@
     <ClCompile Include="Source\MapperParser.cpp" />
     <ClCompile Include="Source\Mouse.cpp" />
     <ClCompile Include="Source\PhysicalController.cpp" />
+    <ClCompile Include="Source\PhysicalControllerBackendXInput.cpp" />
     <ClCompile Include="Source\StateChangeEventBuffer.cpp" />
     <ClCompile Include="Source\Strings.cpp" />
     <ClCompile Include="Source\VirtualController.cpp" />

@@ -26,6 +26,8 @@
 #include "ApiDirectInput.h"
 #include "Globals.h"
 #include "Mapper.h"
+#include "PhysicalController.h"
+#include "PhysicalControllerBackend.h"
 #include "Strings.h"
 #include "VirtualControllerTypes.h"
 
@@ -251,12 +253,12 @@ namespace Xidi
     return std::nullopt;
   }
 
-  template <EDirectInputVersion diVersion> bool DoesDirectInputControllerSupportXInput(
+  template <EDirectInputVersion diVersion> bool DoesDirectInputControllerSupportConfiguredBackend(
       typename DirectInputTypes<diVersion>::IDirectInputCompatType* dicontext,
       REFGUID instanceGUID,
       std::wstring* devicePath)
   {
-    bool deviceSupportsXInput = false;
+    bool deviceSupportsConfiguredBackend = false;
 
     typename DirectInputTypes<diVersion>::IDirectInputDeviceCompatType* didevice = nullptr;
     HRESULT result = dicontext->CreateDevice(instanceGUID, &didevice, nullptr);
@@ -290,31 +292,33 @@ namespace Xidi
       return false;
     }
 
-    // The documented "best" way of determining if a device supports XInput is to look for
-    // "&IG_" in the device path string.
-    if (nullptr != wcsstr(devinfo.wszPath, L"&IG_") || nullptr != wcsstr(devinfo.wszPath, L"&ig_"))
+    if (true ==
+        Controller::GetPhysicalControllerBackend()->SupportsControllerByGuidAndPath(
+            devinfo.wszPath))
     {
-      deviceSupportsXInput = true;
+      deviceSupportsConfiguredBackend = true;
       if (nullptr != devicePath) *devicePath = devinfo.wszPath;
     }
 
     Infra::Message::OutputFormatted(
         Infra::Message::ESeverity::Debug,
-        L"Device with instance GUID %s and path \"%s\" %s XInput.",
+        L"Device with instance GUID %s and path \"%s\" %s physical controller backend \"%.*s\".",
         Strings::GuidToString(instanceGUID).AsCString(),
         devinfo.wszPath,
-        (deviceSupportsXInput ? L"supports" : L"does not support"));
+        (deviceSupportsConfiguredBackend ? L"supports" : L"does not support"),
+        static_cast<int>(Controller::GetPhysicalControllerBackendName().length()),
+        Controller::GetPhysicalControllerBackendName().data());
 
-    return deviceSupportsXInput;
+    return deviceSupportsConfiguredBackend;
   }
 
-  template bool DoesDirectInputControllerSupportXInput<EDirectInputVersion::k8A>(
+  template bool DoesDirectInputControllerSupportConfiguredBackend<EDirectInputVersion::k8A>(
       IDirectInput8A*, REFGUID, std::wstring*);
-  template bool DoesDirectInputControllerSupportXInput<EDirectInputVersion::k8W>(
+  template bool DoesDirectInputControllerSupportConfiguredBackend<EDirectInputVersion::k8W>(
       IDirectInput8W*, REFGUID, std::wstring*);
-  template bool DoesDirectInputControllerSupportXInput<EDirectInputVersion::kLegacyA>(
+  template bool DoesDirectInputControllerSupportConfiguredBackend<EDirectInputVersion::kLegacyA>(
       IDirectInputA*, REFGUID, std::wstring*);
-  template bool DoesDirectInputControllerSupportXInput<EDirectInputVersion::kLegacyW>(
+  template bool DoesDirectInputControllerSupportConfiguredBackend<EDirectInputVersion::kLegacyW>(
       IDirectInputW*, REFGUID, std::wstring*);
 
   template <EDirectInputVersion diVersion> BOOL EnumerateVirtualControllers(

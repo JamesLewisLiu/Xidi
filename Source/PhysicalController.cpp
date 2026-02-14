@@ -15,6 +15,7 @@
 #include <mutex>
 #include <set>
 #include <stop_token>
+#include <string>
 #include <thread>
 
 #include <Infra/Core/Message.h>
@@ -24,8 +25,9 @@
 #include "ForceFeedbackDevice.h"
 #include "Globals.h"
 #include "ImportApiWinMM.h"
-#include "ImportApiXInput.h"
 #include "Mapper.h"
+#include "PhysicalControllerBackend.h"
+#include "PhysicalControllerBackendXInput.h"
 #include "PhysicalControllerTypes.h"
 #include "Strings.h"
 #include "VirtualController.h"
@@ -56,6 +58,21 @@ namespace Xidi
     /// feedback registration data.
     static std::mutex physicalControllerForceFeedbackMutex[kVirtualControllerMaxCount];
 
+    /// Interface pointer for the configured physical controller backend.
+    static IPhysicalControllerBackend* physicalControllerBackend = nullptr;
+
+    /// Name of the configured physical controller backend.
+    static std::wstring physicalControllerBackendName;
+
+    /// Initializes the physical controller backend data structures. Must only be invoked once.
+    static void InitializePhysicalControllerBackend(void)
+    {
+      physicalControllerBackend = new PhysicalControllerBackendXInput();
+      physicalControllerBackendName = L"XInput (built-in)";
+
+      physicalControllerBackend->Initialize();
+    }
+
     /// Computes an opaque source identifier from a given controller identifier.
     /// @param [in] controllerIdentifier Identifier of the physical controller for which an
     /// identifier is needed.
@@ -71,52 +88,8 @@ namespace Xidi
     /// @return Physical state of the identified controller.
     static SPhysicalState ReadPhysicalControllerState(TControllerIdentifier controllerIdentifier)
     {
-      constexpr uint16_t kUnusedButtonMask =
-          ~((uint16_t)((1u << (unsigned int)EPhysicalButton::UnusedGuide) |
-                       (1u << (unsigned int)EPhysicalButton::UnusedShare)));
-
-      XINPUT_STATE xinputState;
-      DWORD xinputGetStateResult =
-          ImportApiXInput::XInputGetState(controllerIdentifier, &xinputState);
-
-      switch (xinputGetStateResult)
-      {
-        case ERROR_SUCCESS:
-          // Directly using wButtons assumes that the bit layout is the same between the internal
-          // bitset and the XInput data structure. The static assertions below this function verify
-          // this assumption and will cause a compiler error if it is wrong.
-          return {
-              .deviceStatus = EPhysicalDeviceStatus::Ok,
-              .stick =
-                  {xinputState.Gamepad.sThumbLX,
-                   xinputState.Gamepad.sThumbLY,
-                   xinputState.Gamepad.sThumbRX,
-                   xinputState.Gamepad.sThumbRY},
-              .trigger = {xinputState.Gamepad.bLeftTrigger, xinputState.Gamepad.bRightTrigger},
-              .button = (uint16_t)(xinputState.Gamepad.wButtons & kUnusedButtonMask)};
-
-        case ERROR_DEVICE_NOT_CONNECTED:
-          return {.deviceStatus = EPhysicalDeviceStatus::NotConnected};
-
-        default:
-          return {.deviceStatus = EPhysicalDeviceStatus::Error};
-      }
+      return physicalControllerBackend->ReadInputState(controllerIdentifier);
     }
-
-    static_assert(1u << (unsigned int)EPhysicalButton::DpadUp == XINPUT_GAMEPAD_DPAD_UP);
-    static_assert(1u << (unsigned int)EPhysicalButton::DpadDown == XINPUT_GAMEPAD_DPAD_DOWN);
-    static_assert(1u << (unsigned int)EPhysicalButton::DpadLeft == XINPUT_GAMEPAD_DPAD_LEFT);
-    static_assert(1u << (unsigned int)EPhysicalButton::DpadRight == XINPUT_GAMEPAD_DPAD_RIGHT);
-    static_assert(1u << (unsigned int)EPhysicalButton::Start == XINPUT_GAMEPAD_START);
-    static_assert(1u << (unsigned int)EPhysicalButton::Back == XINPUT_GAMEPAD_BACK);
-    static_assert(1u << (unsigned int)EPhysicalButton::LS == XINPUT_GAMEPAD_LEFT_THUMB);
-    static_assert(1u << (unsigned int)EPhysicalButton::RS == XINPUT_GAMEPAD_RIGHT_THUMB);
-    static_assert(1u << (unsigned int)EPhysicalButton::LB == XINPUT_GAMEPAD_LEFT_SHOULDER);
-    static_assert(1u << (unsigned int)EPhysicalButton::RB == XINPUT_GAMEPAD_RIGHT_SHOULDER);
-    static_assert(1u << (unsigned int)EPhysicalButton::A == XINPUT_GAMEPAD_A);
-    static_assert(1u << (unsigned int)EPhysicalButton::B == XINPUT_GAMEPAD_B);
-    static_assert(1u << (unsigned int)EPhysicalButton::X == XINPUT_GAMEPAD_X);
-    static_assert(1u << (unsigned int)EPhysicalButton::Y == XINPUT_GAMEPAD_Y);
 
     /// Scales a vibration strength value by the specified scaling factor. If the resulting strength
     /// exceeds the maximum possible strength it is saturated at the maximum possible strength.
@@ -157,15 +130,18 @@ namespace Xidi
                       .ValueOr(100)) /
           100.0;
 
-      // Impulse triggers are ignored because the XInput API does not support them.
-      XINPUT_VIBRATION xinputVibration = {
-          .wLeftMotorSpeed = ScaledVibrationStrength(
+      const ForceFeedback::SPhysicalActuatorComponents scaledVibration = {
+          .leftMotor = ScaledVibrationStrength(
               vibration.leftMotor, kForceFeedbackEffectStrengthScalingFactor),
-          .wRightMotorSpeed = ScaledVibrationStrength(
-              vibration.rightMotor, kForceFeedbackEffectStrengthScalingFactor)};
-      return (
-          ERROR_SUCCESS ==
-          ImportApiXInput::XInputSetState((DWORD)controllerIdentifier, &xinputVibration));
+          .rightMotor = ScaledVibrationStrength(
+              vibration.rightMotor, kForceFeedbackEffectStrengthScalingFactor),
+          .leftImpulseTrigger = ScaledVibrationStrength(
+              vibration.leftImpulseTrigger, kForceFeedbackEffectStrengthScalingFactor),
+          .rightImpulseTrigger = ScaledVibrationStrength(
+              vibration.rightImpulseTrigger, kForceFeedbackEffectStrengthScalingFactor)};
+
+      return physicalControllerBackend->WriteForceFeedbackState(
+          controllerIdentifier, scaledVibration);
     }
 
     /// Periodically plays force feedback effects on the physical controller actuators.
@@ -351,6 +327,9 @@ namespace Xidi
           initFlag,
           []() -> void
           {
+            // Initialize the physical controller backend.
+            InitializePhysicalControllerBackend();
+
             // Initialize controller state data structures.
             for (auto controllerIdentifier = 0;
                  controllerIdentifier < _countof(physicalControllerState);
@@ -440,7 +419,19 @@ namespace Xidi
           });
     }
 
-    SCapabilities GetControllerCapabilities(TControllerIdentifier controllerIdentifier)
+    IPhysicalControllerBackend* GetPhysicalControllerBackend(void)
+    {
+      Initialize();
+      return physicalControllerBackend;
+    }
+
+    std::wstring_view GetPhysicalControllerBackendName(void)
+    {
+      Initialize();
+      return physicalControllerBackendName;
+    }
+
+    SCapabilities GetVirtualControllerCapabilities(TControllerIdentifier controllerIdentifier)
     {
       Initialize();
       return Mapper::GetConfigured(controllerIdentifier)->GetCapabilities();

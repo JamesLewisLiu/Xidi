@@ -321,5 +321,5 @@ namespace Xidi
         spherical.fill(0);
       }
     } // namespace ForceFeedback
-  }   // namespace Controller
+  } // namespace Controller
 } // namespace Xidi

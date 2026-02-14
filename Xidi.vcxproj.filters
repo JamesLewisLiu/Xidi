@@ -131,16 +131,16 @@
     <ClInclude Include="Include\Xidi\Internal\ExportApiDirectInput.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Xidi\Plugin.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Include\Xidi\PhysicalControllerTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Include\Xidi\VirtualControllerTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Xidi\Internal\BackendXInput.h">
+    <ClInclude Include="Include\Xidi\PhysicalControllerBackend.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Xidi\Internal\PhysicalControllerBackendXInput.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -250,7 +250,7 @@
     <ClCompile Include="Source\ApiXidiMetadata.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\BackendXInput.cpp">
+    <ClCompile Include="Source\PhysicalControllerBackendXInput.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

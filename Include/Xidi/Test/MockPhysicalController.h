@@ -60,7 +60,7 @@ namespace XidiTest
     /// Retrieves and returns the capabilities implemented by the mapper associated with this mock
     /// physical controller.
     /// @return Mapper-derived capabilities data structure.
-    SCapabilities GetControllerCapabilities(void) const;
+    SCapabilities GetVirtualControllerCapabilities(void) const;
 
     /// Retrieves and returns the current physical state.
     /// @return Current physical state being reported to the test cases that request it.

@@ -693,5 +693,5 @@ namespace Xidi
         TEffectValue ComputeRawMagnitude(TEffectTimeMs rawTime) const override;
       };
     } // namespace ForceFeedback
-  }   // namespace Controller
+  } // namespace Controller
 } // namespace Xidi

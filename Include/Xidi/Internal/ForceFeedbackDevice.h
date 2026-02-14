@@ -220,5 +220,5 @@ namespace Xidi
         TEffectTimeMs timestampRelativeLastPlay;
       };
     } // namespace ForceFeedback
-  }   // namespace Controller
+  } // namespace Controller
 } // namespace Xidi

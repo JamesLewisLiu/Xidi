@@ -133,7 +133,7 @@ namespace Xidi
           const HRESULT deviceInfoResult = createdDevice->GetDeviceInfo(&deviceInfo);
 
           const bool deviceSupportsXInput =
-              DoesDirectInputControllerSupportXInput<diVersion>(underlyingDIObject, rguid);
+              DoesDirectInputControllerSupportConfiguredBackend<diVersion>(underlyingDIObject, rguid);
           if (true == deviceSupportsXInput)
           {
             if (Infra::Message::WillOutputMessageOfSeverity(Infra::Message::ESeverity::Info))
@@ -371,7 +371,7 @@ namespace Xidi
 
     // If the present controller supports XInput, indicate such by adding it to the set of instance
     // identifiers of interest.
-    if (DoesDirectInputControllerSupportXInput<diVersion>(
+    if (DoesDirectInputControllerSupportConfiguredBackend<diVersion>(
             callbackInfo->instance->underlyingDIObject, lpddi->guidInstance))
     {
       callbackInfo->seenInstanceIdentifiers.insert(lpddi->guidInstance);

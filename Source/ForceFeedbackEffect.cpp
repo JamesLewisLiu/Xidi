@@ -265,5 +265,5 @@ namespace Xidi
         return ComputeRawMagnitude(rawTime) * commonParameters.gainFraction;
       }
     } // namespace ForceFeedback
-  }   // namespace Controller
+  } // namespace Controller
 } // namespace Xidi

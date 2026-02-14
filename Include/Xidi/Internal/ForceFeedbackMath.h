@@ -94,5 +94,5 @@ namespace Xidi
           return rawAngle;
       }
     } // namespace ForceFeedback
-  }   // namespace Controller
+  } // namespace Controller
 } // namespace Xidi

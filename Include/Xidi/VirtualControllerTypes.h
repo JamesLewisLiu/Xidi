@@ -23,7 +23,7 @@ namespace Xidi
   {
     /// Integer type used to identify physical controllers by index.
     using TControllerIdentifier = uint16_t;
-    
+
     /// Maximum number of virtual controllers that Xidi supports. Not all will necessarily be
     /// physically present at any given time or even supported by the controller back-end. Highest
     /// allowable controller identifier is one less than this value.
