@@ -140,6 +140,9 @@
     <ClInclude Include="Include\Xidi\VirtualControllerTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Include\Xidi\Internal\BackendXInput.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\ApiDirectInput.cpp">
@@ -245,6 +248,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\ApiXidiMetadata.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BackendXInput.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

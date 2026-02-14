@@ -105,6 +105,25 @@ namespace Xidi
       Count
     };
 
+    /// Enumerates the force feedback actuators present on physical controllers.
+    enum class EForceFeedbackActuator : uint8_t
+    {
+      /// Left motor (low-frequency rumble)
+      LeftMotor,
+
+      /// Right motor (high-frequency rumble)
+      RightMotor,
+
+      /// Left impulse trigger (embedded in LT)
+      LeftImpulseTrigger,
+
+      /// Right impulse trigger (embedded in RT)
+      RightImpulseTrigger,
+
+      /// Sentinel value, total number of enumerators
+      Count
+    };
+
     /// Data format for representing the physical controller capabilities, as received from the
     /// controller backend. Used to identify the components of the Xidi physical controller data
     /// structures that the backend actually supports for a given controller.
@@ -226,25 +245,6 @@ namespace Xidi
 
     static_assert(sizeof(SPhysicalState) <= 16, "Data structure size constraint violation.");
 
-    /// Enumerates the force feedback actuators present on physical controllers.
-    enum class EForceFeedbackActuator : uint8_t
-    {
-      /// Left motor (low-frequency rumble)
-      LeftMotor,
-
-      /// Right motor (high-frequency rumble)
-      RightMotor,
-
-      /// Left impulse trigger (embedded in LT)
-      LeftImpulseTrigger,
-
-      /// Right impulse trigger (embedded in RT)
-      RightImpulseTrigger,
-
-      /// Sentinel value, total number of enumerators
-      Count
-    };
-
     /// Type used to represent a force feedback effect value that can be sent to a physical
     /// actuator.
     using TForceFeedbackActuatorValue = uint16_t;
@@ -259,5 +259,72 @@ namespace Xidi
 
       constexpr bool operator==(const SForceFeedbackState& other) const = default;
     };
+
+    /// Pre-defined constant representing all analog sticks being supported in a physical controller
+    /// capabilities data structure.
+    inline constexpr unsigned int kPhysicalCapabilitiesAllAnalogSticks =
+        ((1u << static_cast<unsigned int>(EPhysicalStick::LeftX)) |
+         (1u << static_cast<unsigned int>(EPhysicalStick::LeftY)) |
+         (1u << static_cast<unsigned int>(EPhysicalStick::RightX)) |
+         (1u << static_cast<unsigned int>(EPhysicalStick::RightY)));
+
+    /// Pre-defined constant representing all analog triggers being supported in a physical
+    /// controller capabilities data structure.
+    inline constexpr unsigned int kPhysicalCapabilitiesAllAnalogTriggers =
+        ((1u << static_cast<unsigned int>(EPhysicalTrigger::LT)) |
+         (1u << static_cast<unsigned int>(EPhysicalTrigger::RT)));
+
+    /// Pre-defined constant representing the standard set of buttons, as documented in the
+    /// XInput API, supported in a physical controller capabilities data structure.
+    inline constexpr unsigned int kPhysicalCapabilitiesStandardXInputButtons =
+        ((1u << static_cast<unsigned int>(EPhysicalButton::DpadUp)) |
+         (1u << static_cast<unsigned int>(EPhysicalButton::DpadDown)) |
+         (1u << static_cast<unsigned int>(EPhysicalButton::DpadLeft)) |
+         (1u << static_cast<unsigned int>(EPhysicalButton::DpadRight)) |
+         (1u << static_cast<unsigned int>(EPhysicalButton::Start)) |
+         (1u << static_cast<unsigned int>(EPhysicalButton::Back)) |
+         (1u << static_cast<unsigned int>(EPhysicalButton::LS)) |
+         (1u << static_cast<unsigned int>(EPhysicalButton::RS)) |
+         (1u << static_cast<unsigned int>(EPhysicalButton::LB)) |
+         (1u << static_cast<unsigned int>(EPhysicalButton::RB)) |
+         (1u << static_cast<unsigned int>(EPhysicalButton::A)) |
+         (1u << static_cast<unsigned int>(EPhysicalButton::B)) |
+         (1u << static_cast<unsigned int>(EPhysicalButton::X)) |
+         (1u << static_cast<unsigned int>(EPhysicalButton::Y)));
+
+    /// Pre-defined constant representing all buttons, even those not documented in the
+    /// XInput API, supported in a physical controller capabilities data structure.
+    inline constexpr unsigned int kPhysicalCapabilitiesAllButtons =
+        ((1u << static_cast<unsigned int>(EPhysicalButton::DpadUp)) |
+         (1u << static_cast<unsigned int>(EPhysicalButton::DpadDown)) |
+         (1u << static_cast<unsigned int>(EPhysicalButton::DpadLeft)) |
+         (1u << static_cast<unsigned int>(EPhysicalButton::DpadRight)) |
+         (1u << static_cast<unsigned int>(EPhysicalButton::Start)) |
+         (1u << static_cast<unsigned int>(EPhysicalButton::Back)) |
+         (1u << static_cast<unsigned int>(EPhysicalButton::LS)) |
+         (1u << static_cast<unsigned int>(EPhysicalButton::RS)) |
+         (1u << static_cast<unsigned int>(EPhysicalButton::LB)) |
+         (1u << static_cast<unsigned int>(EPhysicalButton::RB)) |
+         (1u << static_cast<unsigned int>(EPhysicalButton::UnusedGuide)) |
+         (1u << static_cast<unsigned int>(EPhysicalButton::UnusedShare)) |
+         (1u << static_cast<unsigned int>(EPhysicalButton::A)) |
+         (1u << static_cast<unsigned int>(EPhysicalButton::B)) |
+         (1u << static_cast<unsigned int>(EPhysicalButton::X)) |
+         (1u << static_cast<unsigned int>(EPhysicalButton::Y)));
+
+    /// Pre-defined constant representing the standard set of force feedback actuators, as
+    /// documented in the XInput API, supported in a physical controller capabilities data
+    /// structure.
+    inline constexpr unsigned int kPhysicalCapabilitiesStandardXInputForceFeedbackActuators =
+        ((1u << static_cast<unsigned int>(EForceFeedbackActuator::LeftMotor)) |
+         (1u << static_cast<unsigned int>(EForceFeedbackActuator::RightMotor)));
+
+    /// Pre-defined constant representing all force feedback actuators, even those not documented in
+    /// the XInput API, supported in a physical controller capabilities data structure.
+    inline constexpr unsigned int kPhysicalCapabilitiesAllForceFeedbackActuators =
+        ((1u << static_cast<unsigned int>(EForceFeedbackActuator::LeftMotor)) |
+         (1u << static_cast<unsigned int>(EForceFeedbackActuator::RightMotor)) |
+         (1u << static_cast<unsigned int>(EForceFeedbackActuator::LeftImpulseTrigger)) |
+         (1u << static_cast<unsigned int>(EForceFeedbackActuator::RightImpulseTrigger)));
   } // namespace Controller
 } // namespace Xidi

@@ -26,6 +26,8 @@ namespace Xidi
     /// physical controllers.
     class IPhysicalControllerBackend
     {
+    public:
+
       /// Invoked to give this plugin an opportunity to initialize. Xidi will call this method
       /// before any of the others.
       virtual void Initialize(void) = 0;
@@ -58,7 +60,7 @@ namespace Xidi
 
       /// Reads and returns the instantaneous input state of the physical controller identified by
       /// index. The required return format is Xidi's data structure for a physical controller
-      /// state.
+      /// state. Xidi calls this method very frequently.
       /// @param [in] physicalControllerIndex Index of the physical controller whose state is to be
       /// read.
       /// @return Filled-out data structure indicating the state of the physical controller. This
@@ -69,10 +71,11 @@ namespace Xidi
       /// Writes the force feedback state to the physical controller identified by index. Input
       /// format to this method is Xidi's internal force feedback state data structure.
       /// @param [in] physicalControllerIndex Index of the physical controller whose state is to be
-      /// read.
+      /// read. Xidi calls this method very frequently.
       /// @param [in] vibrationState Filled-out data structure indicating the magnitudes of the
       /// forces to be actuated to each physical force feedback actuator.
-      virtual void WriteForceFeedbackState(
+      /// @return `true` if the setting of force feedback state was successful, `false` otherwise.
+      virtual bool WriteForceFeedbackState(
           TPhysicalControllerIndex physicalControllerIndex,
           SPhysicalControllerVibration vibrationState) = 0;
     };

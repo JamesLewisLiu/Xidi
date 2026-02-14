@@ -26,6 +26,9 @@ namespace Xidi
 {
   namespace ImportApiXInput
   {
+    /// Maximum number of controllers supported by the imported XInput API.
+    constexpr int kMaxControllerCount = XUSER_MAX_COUNT;
+
     /// Dynamically loads the XInput library and sets up all imported function calls.
     void Initialize(void);
 
