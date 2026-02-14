@@ -155,6 +155,7 @@
     <ClInclude Include="Include\Xidi\Internal\XidiConfigReader.h" />
     <ClInclude Include="Include\Xidi\PhysicalControllerBackend.h" />
     <ClInclude Include="Include\Xidi\PhysicalControllerTypes.h" />
+    <ClInclude Include="Include\Xidi\PluginTypes.h" />
     <ClInclude Include="Include\Xidi\VirtualControllerTypes.h" />
     <ClInclude Include="Resources\Xidi.h" />
   </ItemGroup>

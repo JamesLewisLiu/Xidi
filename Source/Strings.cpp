@@ -197,6 +197,36 @@ namespace Xidi
       return initString;
     }
 
+    std::wstring PluginFilename(std::wstring_view pluginName)
+    {
+      std::wstring pluginFilename;
+
+      std::wstring_view pieces[] = {
+          Infra::ProcessInfo::GetThisModuleDirectoryName(),
+          L"\\",
+          pluginName,
+          L".",
+          kStrPluginFilenameSuffix,
+          L".",
+#ifdef _WIN64
+          L"64",
+#else
+          L"32",
+#endif
+          L".dll"};
+
+      size_t totalLength = 0;
+      for (int i = 0; i < _countof(pieces); ++i)
+        totalLength += pieces[i].length();
+
+      pluginFilename.reserve(1 + totalLength);
+
+      for (int i = 0; i < _countof(pieces); ++i)
+        pluginFilename.append(pieces[i]);
+
+      return pluginFilename;
+    }
+
     const wchar_t* AxisTypeString(Controller::EAxis axis)
     {
       switch (axis)

@@ -12,6 +12,7 @@
 #pragma once
 
 #include "PhysicalControllerTypes.h"
+#include "PluginTypes.h"
 
 namespace Xidi
 {
@@ -22,13 +23,14 @@ namespace Xidi
 
   /// Interface declaration for all plugins that implement a backend for communication with
   /// physical controllers.
-  class IPhysicalControllerBackend
+  class IPhysicalControllerBackend : public IPlugin
   {
   public:
 
-    /// Invoked to give this plugin an opportunity to initialize. Xidi will call this method
-    /// before any of the others.
-    virtual void Initialize(void) = 0;
+    EPluginType PluginType(void) override final
+    {
+      return EPluginType::PhysicalControllerBackend;
+    }
 
     /// Retrieves and returns the maximum number of physical controllers supported by this
     /// backend. Xidi will use this number to determine how many virtual controllers to present to

@@ -39,11 +39,6 @@ namespace Xidi
     /// @return Interface pointer for the configured physical controller backend.
     IPhysicalControllerBackend* GetPhysicalControllerBackend(void);
 
-    /// Retrieves and returns the name of the configured physical controller backend. This is
-    /// generally useful only for logging purposes.
-    /// @return Name of the configured physical controller backend.
-    std::wstring_view GetPhysicalControllerBackendName(void);
-
     /// Retrieves and returns the capabilities of the virtual controller layout implemented by the
     /// mapper associated with the specified physical controller. Controller capabilities act as
     /// metadata that are used internally and can be presented to applications. Concurrency-safe.

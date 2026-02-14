@@ -133,6 +133,7 @@
     <ClInclude Include="Include\Xidi\Internal\Strings.h" />
     <ClInclude Include="Include\Xidi\PhysicalControllerBackend.h" />
     <ClInclude Include="Include\Xidi\PhysicalControllerTypes.h" />
+    <ClInclude Include="Include\Xidi\PluginTypes.h" />
     <ClInclude Include="Include\Xidi\Test\MockDirectInput.h" />
     <ClInclude Include="Include\Xidi\Test\MockDirectInputDevice.h" />
     <ClInclude Include="Include\Xidi\Test\MockElementMapper.h" />

@@ -5,19 +5,24 @@
  * Authored by Samuel Grossman
  * Copyright (c) 2016-2026
  ***********************************************************************************************//**
- * @file PhysicalControllerBackendXInput.h
- *   Declaration of the built-in XInput physical controller backend.
+ * @file SimpleXInputBackend.h
+ *   Interface declaration for a simplified version of the built-in XInput physical controller
+ *   backend, shown as a complete, working example of a Xidi plugin.
  **************************************************************************************************/
 
 #pragma once
 
-#include "PhysicalControllerBackend.h"
-#include "PluginTypes.h"
+#include "Xidi/PhysicalControllerBackend.h"
 
-namespace Xidi
+namespace XidiPluginExample
 {
-  /// Implements the built-in XInput backend for communicating with physical controllers.
-  class PhysicalControllerBackendXInput : public IPhysicalControllerBackend
+  using namespace ::Xidi;
+
+  /// Simplified version of the built-in XInput physical controller backend, but as a Xidi plugin
+  /// that can be configured and loaded externally. This plugin's implementation directly links with
+  /// the XInput import library and hence does not rely on dynamic loading via `LoadLibrary` and
+  /// `GetProcAddress`.
+  class SimpleXInputBackend : public IPhysicalControllerBackend
   {
   public:
 
@@ -35,4 +40,4 @@ namespace Xidi
         TPhysicalControllerIndex physicalControllerIndex,
         SPhysicalControllerVibration vibrationState) override;
   };
-} // namespace Xidi
+} // namespace XidiPluginExample

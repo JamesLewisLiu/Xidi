@@ -135,6 +135,9 @@
     <ClInclude Include="Include\Xidi\PhysicalControllerBackend.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Include\Xidi\PluginTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Test\Case\AxisMapperTest.cpp">

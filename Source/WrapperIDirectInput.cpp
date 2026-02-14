@@ -146,8 +146,9 @@ namespace Xidi
                   L"Attempting to bind directly to supported device \"%s\" with instance GUID %s. Xidi hides devices supported by physical controller backend \"%.*s\" and therefore is rejecting this request.",
                   Infra::TemporaryString(deviceInfo.tszProductName).AsCString(),
                   Strings::GuidToString(deviceInfo.guidInstance).AsCString(),
-                  static_cast<int>(Controller::GetPhysicalControllerBackendName().length()),
-                  Controller::GetPhysicalControllerBackendName().data());
+                  static_cast<int>(
+                      Controller::GetPhysicalControllerBackend()->PluginName().length()),
+                  Controller::GetPhysicalControllerBackend()->PluginName().data());
             }
             createdDevice->Release();
             return DIERR_DEVICENOTREG;
@@ -162,8 +163,9 @@ namespace Xidi
                   L"Binding to device \"%s\" with instance GUID %s, which is not supported by physical controller backend \"%.*s\". Xidi will not handle communication with it.",
                   Infra::TemporaryString(deviceInfo.tszProductName).AsCString(),
                   Strings::GuidToString(deviceInfo.guidInstance).AsCString(),
-                  static_cast<int>(Controller::GetPhysicalControllerBackendName().length()),
-                  Controller::GetPhysicalControllerBackendName().data());
+                  static_cast<int>(
+                      Controller::GetPhysicalControllerBackend()->PluginName().length()),
+                  Controller::GetPhysicalControllerBackend()->PluginName().data());
             }
             else
             {
@@ -181,8 +183,8 @@ namespace Xidi
             Infra::Message::ESeverity::Info,
             L"Failed (result = 0x%08x) to bind to a device unsupported by physical controller backend \"%.*s\".",
             static_cast<unsigned int>(createDeviceResult),
-            static_cast<int>(Controller::GetPhysicalControllerBackendName().length()),
-            Controller::GetPhysicalControllerBackendName().data());
+            static_cast<int>(Controller::GetPhysicalControllerBackend()->PluginName().length()),
+            Controller::GetPhysicalControllerBackend()->PluginName().data());
       }
 
       if (nullptr != createdDevice) *lplpDirectInputDevice = createdDevice;
@@ -265,14 +267,14 @@ namespace Xidi
         Infra::Message::OutputFormatted(
             Infra::Message::ESeverity::Debug,
             L"Enumerate: System has devices supported by physical controller backend \"%.*s\", so Xidi virtual controllers are being presented to the application before other controllers.",
-            static_cast<int>(Controller::GetPhysicalControllerBackendName().length()),
-            Controller::GetPhysicalControllerBackendName().data());
+            static_cast<int>(Controller::GetPhysicalControllerBackend()->PluginName().length()),
+            Controller::GetPhysicalControllerBackend()->PluginName().data());
       else
         Infra::Message::OutputFormatted(
             Infra::Message::ESeverity::Debug,
             L"Enumerate: System has no devices supported by physical controller backend \"%.*s\", so Xidi virtual controllers are being presented to the application after other controllers.",
-            static_cast<int>(Controller::GetPhysicalControllerBackendName().length()),
-            Controller::GetPhysicalControllerBackendName().data());
+            static_cast<int>(Controller::GetPhysicalControllerBackend()->PluginName().length()),
+            Controller::GetPhysicalControllerBackend()->PluginName().data());
 
       // Second, if the system has controllers supported by the configured physical controller
       // backend, enumerate the virtual controllers now. These will be the first controllers seen by
@@ -398,8 +400,8 @@ namespace Xidi
             L"Enumerate: DirectInput device \"%s\" with instance GUID %s supports physical controller backend \"%.*s\" and will not be presented to the application.",
             Infra::TemporaryString(lpddi->tszProductName).AsCString(),
             Strings::GuidToString(lpddi->guidInstance).AsCString(),
-            static_cast<int>(Controller::GetPhysicalControllerBackendName().length()),
-            Controller::GetPhysicalControllerBackendName().data());
+            static_cast<int>(Controller::GetPhysicalControllerBackend()->PluginName().length()),
+            Controller::GetPhysicalControllerBackend()->PluginName().data());
       }
     }
     else
@@ -411,8 +413,8 @@ namespace Xidi
             L"Enumerate: DirectInput device \"%s\" with instance GUID %s does not support physical controller backend \"%.*s\" and may be presented to the application.",
             Infra::TemporaryString(lpddi->tszProductName).AsCString(),
             Strings::GuidToString(lpddi->guidInstance).AsCString(),
-            static_cast<int>(Controller::GetPhysicalControllerBackendName().length()),
-            Controller::GetPhysicalControllerBackendName().data());
+            static_cast<int>(Controller::GetPhysicalControllerBackend()->PluginName().length()),
+            Controller::GetPhysicalControllerBackend()->PluginName().data());
       }
     }
 

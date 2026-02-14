@@ -61,6 +61,9 @@ namespace Xidi
     // These strings can safely be used at any time, including to perform static initialization.
     // Views are guaranteed to be null-terminated.
 
+    /// Suffix part of a library filename for plugin libraries.
+    inline constexpr std::wstring_view kStrPluginFilenameSuffix = L"XidiPlugin";
+
     /// Base name of the DirectInput library to import.
     inline constexpr std::wstring_view kStrLibraryNameDirectInput = L"dinput.dll";
 
@@ -72,6 +75,9 @@ namespace Xidi
 
     /// Configuration file setting separator for generating per-controller setting strings.
     inline constexpr wchar_t kCharConfigurationSettingSeparator = L'.';
+
+    /// Configuration file setting for identifying a plugin that Xidi should load.
+    inline constexpr std::wstring_view kStrConfigurationSettingPlugin = L"Plugin";
 
     /// Configuration file section name for log-related settings.
     inline constexpr std::wstring_view kStrConfigurationSectionLog = L"Log";
@@ -237,6 +243,11 @@ namespace Xidi
 
     /// Complete path and filename of the main Xidi library.
     std::wstring_view GetXidiMainLibraryFilename(void);
+
+    /// Generates and returns the complete path and filename for the specified plugin.
+    /// @param [in] pluginName Name of the requested plugin.
+    /// @return Complete and absolute expectedpath of the plugin.
+    std::wstring PluginFilename(std::wstring_view pluginName);
 
     /// Returns a string representing the specified axis type.
     /// @param [in] axis Axis type for which a string is requested.

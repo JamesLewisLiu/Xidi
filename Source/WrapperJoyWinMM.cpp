@@ -396,8 +396,8 @@ namespace Xidi
       Infra::Message::OutputFormatted(
           Infra::Message::ESeverity::Debug,
           L"Using DirectInput to detect devices supported by physical controller backend \"%.*s\"...",
-          static_cast<int>(Controller::GetPhysicalControllerBackendName().length()),
-          Controller::GetPhysicalControllerBackendName().data());
+          static_cast<int>(Controller::GetPhysicalControllerBackend()->PluginName().length()),
+          Controller::GetPhysicalControllerBackend()->PluginName().data());
       IDirectInput8W* directInputInterface = nullptr;
       if (S_OK !=
           ImportApiDirectInput::Version8::DirectInput8Create(
@@ -429,8 +429,8 @@ namespace Xidi
       Infra::Message::OutputFormatted(
           Infra::Message::ESeverity::Debug,
           L"Done detecting devices supported by physical controller backend \"%.*s\".",
-          static_cast<int>(Controller::GetPhysicalControllerBackendName().length()),
-          Controller::GetPhysicalControllerBackendName().data());
+          static_cast<int>(Controller::GetPhysicalControllerBackend()->PluginName().length()),
+          Controller::GetPhysicalControllerBackend()->PluginName().data());
     }
 
     /// Fills in the specified buffer with the name of the registry key to use for referencing

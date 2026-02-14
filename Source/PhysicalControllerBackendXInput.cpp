@@ -12,6 +12,7 @@
 #include "PhysicalControllerBackendXInput.h"
 
 #include <cstring>
+#include <string_view>
 
 #include "ImportApiXInput.h"
 #include "PhysicalControllerTypes.h"
@@ -19,6 +20,11 @@
 namespace Xidi
 {
   using namespace ::Xidi::Controller;
+
+  std::wstring_view PhysicalControllerBackendXInput::PluginName(void)
+  {
+    return L"XInput (built-in)";
+  }
 
   void PhysicalControllerBackendXInput::Initialize(void)
   {

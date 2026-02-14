@@ -269,8 +269,8 @@ namespace Xidi
           Infra::Message::ESeverity::Warning,
           L"Unable to check if device with instance GUID %s supports physical controller backend \"%.*s\": Failed to create the device (result = 0x%08x).",
           Strings::GuidToString(instanceGUID).AsCString(),
-          static_cast<int>(Controller::GetPhysicalControllerBackendName().length()),
-          Controller::GetPhysicalControllerBackendName().data(),
+          static_cast<int>(Controller::GetPhysicalControllerBackend()->PluginName().length()),
+          Controller::GetPhysicalControllerBackend()->PluginName().data(),
           static_cast<unsigned int>(result));
       return false;
     }
@@ -290,8 +290,8 @@ namespace Xidi
           Infra::Message::ESeverity::Warning,
           L"Unable to check if device with instance GUID %s supports physical controller backend \"%.*s\": Failed to query for property DIPROP_GUIDANDPATH (result = 0x%08x).",
           Strings::GuidToString(instanceGUID).AsCString(),
-          static_cast<int>(Controller::GetPhysicalControllerBackendName().length()),
-          Controller::GetPhysicalControllerBackendName().data(),
+          static_cast<int>(Controller::GetPhysicalControllerBackend()->PluginName().length()),
+          Controller::GetPhysicalControllerBackend()->PluginName().data(),
           static_cast<unsigned int>(result));
       return false;
     }
@@ -310,8 +310,8 @@ namespace Xidi
         Strings::GuidToString(instanceGUID).AsCString(),
         devinfo.wszPath,
         (deviceSupportsConfiguredBackend ? L"supports" : L"does not support"),
-        static_cast<int>(Controller::GetPhysicalControllerBackendName().length()),
-        Controller::GetPhysicalControllerBackendName().data());
+        static_cast<int>(Controller::GetPhysicalControllerBackend()->PluginName().length()),
+        Controller::GetPhysicalControllerBackend()->PluginName().data());
 
     return deviceSupportsConfiguredBackend;
   }

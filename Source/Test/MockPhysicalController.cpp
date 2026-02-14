@@ -137,9 +137,15 @@ namespace Xidi
     {
     public:
 
-      // IPhysicalControllerBackend
+      // IPlugin
+      std::wstring_view PluginName(void) override
+      {
+        return L"XInput (fake, for testing)";
+      }
+
       void Initialize(void) override {}
 
+      // IPhysicalControllerBackend
       TPhysicalControllerIndex MaxPhysicalControllerCount(void) override
       {
         // Hard-coded for testing.
@@ -186,11 +192,6 @@ namespace Xidi
     {
       static FakePhysicalControllerBackend fakeBackend;
       return &fakeBackend;
-    }
-
-    std::wstring_view GetPhysicalControllerBackendName(void)
-    {
-      return L"XInput (fake, for testing)";
     }
 
     SCapabilities GetVirtualControllerCapabilities(TControllerIdentifier controllerIdentifier)

@@ -61,15 +61,10 @@ namespace Xidi
     /// Interface pointer for the configured physical controller backend.
     static IPhysicalControllerBackend* physicalControllerBackend = nullptr;
 
-    /// Name of the configured physical controller backend.
-    static std::wstring physicalControllerBackendName;
-
     /// Initializes the physical controller backend data structures. Must only be invoked once.
     static void InitializePhysicalControllerBackend(void)
     {
       physicalControllerBackend = new PhysicalControllerBackendXInput();
-      physicalControllerBackendName = L"XInput (built-in)";
-
       physicalControllerBackend->Initialize();
     }
 
@@ -423,12 +418,6 @@ namespace Xidi
     {
       Initialize();
       return physicalControllerBackend;
-    }
-
-    std::wstring_view GetPhysicalControllerBackendName(void)
-    {
-      Initialize();
-      return physicalControllerBackendName;
     }
 
     SCapabilities GetVirtualControllerCapabilities(TControllerIdentifier controllerIdentifier)
