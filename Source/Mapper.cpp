@@ -446,6 +446,8 @@ namespace Xidi
           configuredMapperFlag,
           []() -> void
           {
+            DumpRegisteredMappers();
+
             const auto& configData = Globals::GetConfigurationData();
 
             if (true == configData.Contains(Strings::kStrConfigurationSectionMapper))

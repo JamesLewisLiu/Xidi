@@ -19,7 +19,7 @@
 /// loads this plugin DLL it will invoke this function to determine how many plugin interfaces it
 /// offers. All such plugin interfaces must implement #IPlugin.
 /// @return Number of plugin interfaces offered by this DLL.
-extern "C" __declspec(dllexport) unsigned int __fastcall XidiPluginGetCount(void);
+extern "C" __declspec(dllexport) int __fastcall XidiPluginGetCount(void);
 
 /// Retrieves and returns an #IPlugin interface pointer for the plugin interface of the specified
 /// index. Plugin interfaces are identified by index, from 0 up to one less than the number

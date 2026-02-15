@@ -202,10 +202,6 @@ namespace Xidi
     {
 #ifndef XIDI_SKIP_CONFIG
       EnableLogIfConfigured();
-
-#ifndef XIDI_SKIP_MAPPERS
-      Controller::Mapper::DumpRegisteredMappers();
-#endif
 #endif
     }
   } // namespace Globals

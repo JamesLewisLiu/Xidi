@@ -13,7 +13,7 @@
 
 #include "Xidi/Plugin.h"
 
-extern "C" unsigned int __fastcall XidiPluginGetCount(void)
+extern "C" int __fastcall XidiPluginGetCount(void)
 {
   return 1;
 }

@@ -146,6 +146,9 @@
     <ClInclude Include="Include\Xidi\PluginTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Include\Xidi\Internal\PluginRegistry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\ApiDirectInput.cpp">
@@ -254,6 +257,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\PhysicalControllerBackendXInput.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\PluginRegistry.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -79,6 +79,10 @@ namespace Xidi
     /// Configuration file setting for identifying a plugin that Xidi should load.
     inline constexpr std::wstring_view kStrConfigurationSettingPlugin = L"Plugin";
 
+    /// Configuration file settingn for identifying the desired physical controller backend.
+    inline constexpr std::wstring_view kStrConfigurationSettingControllerBackend =
+        L"ControllerBackend";
+
     /// Configuration file section name for log-related settings.
     inline constexpr std::wstring_view kStrConfigurationSectionLog = L"Log";
 

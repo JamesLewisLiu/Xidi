@@ -38,7 +38,9 @@ namespace Xidi
 
     /// Retrieves and returns the name of this plugin, which is how users will identify it in
     /// configuration files and how Xidi will identify it in the logs. This method needs to be
-    /// overridden by each concrete plugin interface implementation.
+    /// overridden by each concrete plugin interface implementation. A plugin's name is expected to
+    /// be constant and hence the returned string must remain valid throughout the lifetime of the
+    /// application.
     /// @return Name of the plugin.
     virtual std::wstring_view PluginName(void) = 0;
 

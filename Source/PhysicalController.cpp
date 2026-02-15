@@ -29,6 +29,7 @@
 #include "PhysicalControllerBackend.h"
 #include "PhysicalControllerBackendXInput.h"
 #include "PhysicalControllerTypes.h"
+#include "PluginRegistry.h"
 #include "Strings.h"
 #include "VirtualController.h"
 #include "VirtualControllerTypes.h"
@@ -61,10 +62,28 @@ namespace Xidi
     /// Interface pointer for the configured physical controller backend.
     static IPhysicalControllerBackend* physicalControllerBackend = nullptr;
 
-    /// Initializes the physical controller backend data structures. Must only be invoked once.
+    /// Initializes the configured physical controller backend. Must only be invoked once.
     static void InitializePhysicalControllerBackend(void)
     {
-      physicalControllerBackend = new PhysicalControllerBackendXInput();
+      std::wstring_view selectedBackend =
+          Globals::GetConfigurationData()[Infra::Configuration::kSectionNameGlobal]
+                                         [Strings::kStrConfigurationSettingControllerBackend]
+                                             .ValueOr(L"");
+      physicalControllerBackend =
+          ((true == selectedBackend.empty())
+               ? new PhysicalControllerBackendXInput()
+               : GetPhysicalControllerBackendInterface(selectedBackend));
+
+      if (nullptr == physicalControllerBackend)
+      {
+        Infra::Message::OutputFormatted(
+            Infra::Message::ESeverity::Error,
+            L"Physical controller backend \"%.*s\" could not be located. Using the built-in default backend instead.",
+            static_cast<int>(selectedBackend.length()),
+            selectedBackend.data());
+        physicalControllerBackend = new PhysicalControllerBackendXInput();
+      }
+
       physicalControllerBackend->Initialize();
     }
 
@@ -322,7 +341,12 @@ namespace Xidi
           initFlag,
           []() -> void
           {
-            // Initialize the physical controller backend.
+            // Plugins may contain physical controller backends, so they must be loaded before
+            // proceeding. This call is idempotent.
+            LoadConfiguredPlugins();
+
+            // Initialize the physical controller backend based on what is specified in the
+            // configuration file.
             InitializePhysicalControllerBackend();
 
             // Initialize controller state data structures.

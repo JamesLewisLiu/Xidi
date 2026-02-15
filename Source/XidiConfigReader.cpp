@@ -61,7 +61,9 @@ namespace Xidi
       ConfigurationFileLayoutSection(
           Infra::Configuration::kSectionNameGlobal,
           {ConfigurationFileLayoutNameAndValueType(
-              Strings::kStrConfigurationSettingPlugin, EValueType::StringMultiValue)}),
+               Strings::kStrConfigurationSettingPlugin, EValueType::StringMultiValue),
+           ConfigurationFileLayoutNameAndValueType(
+               Strings::kStrConfigurationSettingControllerBackend, EValueType::String)}),
       ConfigurationFileLayoutSection(
           Strings::kStrConfigurationSectionLog,
           {
