@@ -56,8 +56,8 @@ namespace Xidi
       TPhysicalControllerIndex physicalControllerIndex)
   {
     constexpr uint16_t kUnusedButtonMask = ~(static_cast<uint16_t>(
-        (1u << static_cast<unsigned int>(EPhysicalButton::UnusedGuide)) |
-        (1u << static_cast<unsigned int>(EPhysicalButton::UnusedShare))));
+        (1u << static_cast<unsigned int>(EPhysicalButton::Guide)) |
+        (1u << static_cast<unsigned int>(EPhysicalButton::Share))));
 
     XINPUT_STATE xinputState;
     DWORD xinputGetStateResult =

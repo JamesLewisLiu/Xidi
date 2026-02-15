@@ -94,8 +94,8 @@ namespace Xidi
       RS,
       LB,
       RB,
-      UnusedGuide,
-      UnusedShare,
+      Guide,
+      Share,
       A,
       B,
       X,
@@ -305,8 +305,8 @@ namespace Xidi
          (1u << static_cast<unsigned int>(EPhysicalButton::RS)) |
          (1u << static_cast<unsigned int>(EPhysicalButton::LB)) |
          (1u << static_cast<unsigned int>(EPhysicalButton::RB)) |
-         (1u << static_cast<unsigned int>(EPhysicalButton::UnusedGuide)) |
-         (1u << static_cast<unsigned int>(EPhysicalButton::UnusedShare)) |
+         (1u << static_cast<unsigned int>(EPhysicalButton::Guide)) |
+         (1u << static_cast<unsigned int>(EPhysicalButton::Share)) |
          (1u << static_cast<unsigned int>(EPhysicalButton::A)) |
          (1u << static_cast<unsigned int>(EPhysicalButton::B)) |
          (1u << static_cast<unsigned int>(EPhysicalButton::X)) |

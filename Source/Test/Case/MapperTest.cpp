@@ -62,7 +62,9 @@ namespace XidiTest
        .buttonBack = std::make_unique<MockElementMapper>(),
        .buttonStart = std::make_unique<MockElementMapper>(),
        .buttonLS = std::make_unique<MockElementMapper>(),
-       .buttonRS = std::make_unique<MockElementMapper>()});
+       .buttonRS = std::make_unique<MockElementMapper>(),
+       .buttonGuide = std::make_unique<MockElementMapper>(),
+       .buttonShare = std::make_unique<MockElementMapper>()});
 
   /// Creates a button set given a compile-time-constant list of buttons.
   /// @param [in] buttons Initializer list containing all of the desired buttons to be added to the

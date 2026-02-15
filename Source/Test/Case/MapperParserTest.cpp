@@ -124,7 +124,8 @@ namespace XidiTest
         {ELEMENT_MAP_INDEX_OF(dpadDown), L"DpadDown"},
         {ELEMENT_MAP_INDEX_OF(triggerLT), L"TriggerLT"},
         {ELEMENT_MAP_INDEX_OF(buttonRB), L"ButtonRB"},
-        {ELEMENT_MAP_INDEX_OF(buttonStart), L"ButtonStart"}};
+        {ELEMENT_MAP_INDEX_OF(buttonStart), L"ButtonStart"},
+        {ELEMENT_MAP_INDEX_OF(buttonGuide), L"ButtonGuide"}};
 
     for (const auto& controllerElement : kControllerElements)
     {
