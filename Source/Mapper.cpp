@@ -554,6 +554,47 @@ namespace Xidi
       return &kNullMapper;
     }
 
+    SPhysicalCapabilities Mapper::GetPhysicalControllerRequiredCapabilities(void) const
+    {
+      SPhysicalCapabilities requirements{};
+
+      requirements[EPhysicalStick::LeftX] = (nullptr != elements.named.stickLeftX);
+      requirements[EPhysicalStick::LeftY] = (nullptr != elements.named.stickLeftY);
+      requirements[EPhysicalStick::RightX] = (nullptr != elements.named.stickRightX);
+      requirements[EPhysicalStick::RightY] = (nullptr != elements.named.stickRightY);
+
+      requirements[EPhysicalTrigger::LT] = (nullptr != elements.named.triggerLT);
+      requirements[EPhysicalTrigger::RT] = (nullptr != elements.named.triggerRT);
+
+      requirements[EPhysicalButton::DpadUp] = (nullptr != elements.named.dpadUp);
+      requirements[EPhysicalButton::DpadDown] = (nullptr != elements.named.dpadDown);
+      requirements[EPhysicalButton::DpadLeft] = (nullptr != elements.named.dpadLeft);
+      requirements[EPhysicalButton::DpadRight] = (nullptr != elements.named.dpadRight);
+      requirements[EPhysicalButton::A] = (nullptr != elements.named.buttonA);
+      requirements[EPhysicalButton::B] = (nullptr != elements.named.buttonB);
+      requirements[EPhysicalButton::X] = (nullptr != elements.named.buttonX);
+      requirements[EPhysicalButton::Y] = (nullptr != elements.named.buttonY);
+      requirements[EPhysicalButton::LB] = (nullptr != elements.named.buttonLB);
+      requirements[EPhysicalButton::RB] = (nullptr != elements.named.buttonRB);
+      requirements[EPhysicalButton::Back] = (nullptr != elements.named.buttonBack);
+      requirements[EPhysicalButton::Start] = (nullptr != elements.named.buttonStart);
+      requirements[EPhysicalButton::LS] = (nullptr != elements.named.buttonLS);
+      requirements[EPhysicalButton::RS] = (nullptr != elements.named.buttonRS);
+      requirements[EPhysicalButton::Guide] = (nullptr != elements.named.buttonGuide);
+      requirements[EPhysicalButton::Share] = (nullptr != elements.named.buttonShare);
+
+      requirements[EForceFeedbackActuator::LeftMotor] =
+          forceFeedbackActuators.named.leftMotor.isPresent;
+      requirements[EForceFeedbackActuator::RightMotor] =
+          forceFeedbackActuators.named.rightMotor.isPresent;
+      requirements[EForceFeedbackActuator::LeftImpulseTrigger] =
+          forceFeedbackActuators.named.leftImpulseTrigger.isPresent;
+      requirements[EForceFeedbackActuator::RightImpulseTrigger] =
+          forceFeedbackActuators.named.rightImpulseTrigger.isPresent;
+
+      return requirements;
+    }
+
     ForceFeedback::SPhysicalActuatorComponents Mapper::MapForceFeedbackVirtualToPhysical(
         ForceFeedback::TOrderedMagnitudeComponents virtualEffectComponents,
         ForceFeedback::TEffectValue gain) const

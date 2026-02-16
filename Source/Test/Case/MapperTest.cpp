@@ -39,9 +39,8 @@ namespace XidiTest
   /// Opaque source identifier used for many mapper tests in this file.
   static constexpr uint32_t kOpaqueSourceIdentifier = 100;
 
-  /// Mapper with a mock element mapper on every possible controller element.
-  /// Does not check for specific contributions.
-  /// For use as a template in test cases.
+  /// Mapper with a mock element mapper on every possible controller element. Does not check for
+  /// specific contributions. For use as a template in test cases.
   static const Mapper kFullyMockedMapper(
       {.stickLeftX = std::make_unique<MockElementMapper>(),
        .stickLeftY = std::make_unique<MockElementMapper>(),
@@ -65,6 +64,10 @@ namespace XidiTest
        .buttonRS = std::make_unique<MockElementMapper>(),
        .buttonGuide = std::make_unique<MockElementMapper>(),
        .buttonShare = std::make_unique<MockElementMapper>()});
+
+  /// Empty force feedback actuator map. Mappers have a default force feedback actuator map, so this
+  /// constant can be used at construction time to replace it with a totally empty map.
+  constexpr Mapper::SForceFeedbackActuatorMap kEmptyForceFeedbackActuatorMap{};
 
   /// Creates a button set given a compile-time-constant list of buttons.
   /// @param [in] buttons Initializer list containing all of the desired buttons to be added to the
@@ -1356,6 +1359,158 @@ namespace XidiTest
             mapper.MapForceFeedbackVirtualToPhysical(testMagnitudeVector, testGainValue);
         TEST_ASSERT(actualActuatorComponents == expectedActuatorComponents);
       }
+    }
+  }
+
+  // Tests each analog stick one at a time to make sure that a mapper correctly reports when it
+  // requires it be supported by the physical controller backend.
+  TEST_CASE(Mapper_GetPhysicalControllerRequiredCapabilities_AnalogSticks)
+  {
+    const struct STestData
+    {
+      unsigned int elementMapIndex;
+      EPhysicalStick expectedRequirement;
+    } testData[] = {
+        {.elementMapIndex = ELEMENT_MAP_INDEX_OF(stickLeftX),
+         .expectedRequirement = EPhysicalStick::LeftX},
+        {.elementMapIndex = ELEMENT_MAP_INDEX_OF(stickLeftY),
+         .expectedRequirement = EPhysicalStick::LeftY},
+        {.elementMapIndex = ELEMENT_MAP_INDEX_OF(stickRightX),
+         .expectedRequirement = EPhysicalStick::RightX},
+        {.elementMapIndex = ELEMENT_MAP_INDEX_OF(stickRightY),
+         .expectedRequirement = EPhysicalStick::RightY}};
+
+    for (const auto& test : testData)
+    {
+      Mapper::UElementMap elementMapToTest;
+      elementMapToTest.all[test.elementMapIndex] = std::make_unique<MockElementMapper>();
+
+      const Mapper mapperToTest(std::move(elementMapToTest.named), kEmptyForceFeedbackActuatorMap);
+
+      const SPhysicalCapabilities expectedPhysicalControllerRequirements = {
+          .stick = static_cast<unsigned int>(1u << static_cast<uint8_t>(test.expectedRequirement))};
+      const SPhysicalCapabilities actualPhysicalControllerRequirements =
+          mapperToTest.GetPhysicalControllerRequiredCapabilities();
+      TEST_ASSERT(actualPhysicalControllerRequirements == expectedPhysicalControllerRequirements);
+    }
+  }
+
+  // Tests each analog trigger one at a time to make sure that a mapper correctly reports when it
+  // requires it be supported by the physical controller backend.
+  TEST_CASE(Mapper_GetPhysicalControllerRequiredCapabilities_AnalogTriggers)
+  {
+    const struct STestData
+    {
+      unsigned int elementMapIndex;
+      EPhysicalTrigger expectedRequirement;
+    } testData[] = {
+        {.elementMapIndex = ELEMENT_MAP_INDEX_OF(triggerLT),
+         .expectedRequirement = EPhysicalTrigger::LT},
+        {.elementMapIndex = ELEMENT_MAP_INDEX_OF(triggerRT),
+         .expectedRequirement = EPhysicalTrigger::RT}};
+
+    for (const auto& test : testData)
+    {
+      Mapper::UElementMap elementMapToTest;
+      elementMapToTest.all[test.elementMapIndex] = std::make_unique<MockElementMapper>();
+
+      const Mapper mapperToTest(std::move(elementMapToTest.named), kEmptyForceFeedbackActuatorMap);
+
+      const SPhysicalCapabilities expectedPhysicalControllerRequirements = {
+          .trigger =
+              static_cast<unsigned int>(1u << static_cast<uint8_t>(test.expectedRequirement))};
+      const SPhysicalCapabilities actualPhysicalControllerRequirements =
+          mapperToTest.GetPhysicalControllerRequiredCapabilities();
+      TEST_ASSERT(actualPhysicalControllerRequirements == expectedPhysicalControllerRequirements);
+    }
+  }
+
+  // Tests each analog trigger one at a time to make sure that a mapper correctly reports when it
+  // requires it be supported by the physical controller backend.
+  TEST_CASE(Mapper_GetPhysicalControllerRequiredCapabilities_DigitalButtons)
+  {
+    const struct STestData
+    {
+      unsigned int elementMapIndex;
+      EPhysicalButton expectedRequirement;
+    } testData[] = {
+        {.elementMapIndex = ELEMENT_MAP_INDEX_OF(dpadUp),
+         .expectedRequirement = EPhysicalButton::DpadUp},
+        {.elementMapIndex = ELEMENT_MAP_INDEX_OF(dpadDown),
+         .expectedRequirement = EPhysicalButton::DpadDown},
+        {.elementMapIndex = ELEMENT_MAP_INDEX_OF(dpadLeft),
+         .expectedRequirement = EPhysicalButton::DpadLeft},
+        {.elementMapIndex = ELEMENT_MAP_INDEX_OF(dpadRight),
+         .expectedRequirement = EPhysicalButton::DpadRight},
+        {.elementMapIndex = ELEMENT_MAP_INDEX_OF(buttonStart),
+         .expectedRequirement = EPhysicalButton::Start},
+        {.elementMapIndex = ELEMENT_MAP_INDEX_OF(buttonBack),
+         .expectedRequirement = EPhysicalButton::Back},
+        {.elementMapIndex = ELEMENT_MAP_INDEX_OF(buttonLS),
+         .expectedRequirement = EPhysicalButton::LS},
+        {.elementMapIndex = ELEMENT_MAP_INDEX_OF(buttonRS),
+         .expectedRequirement = EPhysicalButton::RS},
+        {.elementMapIndex = ELEMENT_MAP_INDEX_OF(buttonLB),
+         .expectedRequirement = EPhysicalButton::LB},
+        {.elementMapIndex = ELEMENT_MAP_INDEX_OF(buttonRB),
+         .expectedRequirement = EPhysicalButton::RB},
+        {.elementMapIndex = ELEMENT_MAP_INDEX_OF(buttonGuide),
+         .expectedRequirement = EPhysicalButton::Guide},
+        {.elementMapIndex = ELEMENT_MAP_INDEX_OF(buttonShare),
+         .expectedRequirement = EPhysicalButton::Share},
+        {.elementMapIndex = ELEMENT_MAP_INDEX_OF(buttonA),
+         .expectedRequirement = EPhysicalButton::A},
+        {.elementMapIndex = ELEMENT_MAP_INDEX_OF(buttonB),
+         .expectedRequirement = EPhysicalButton::B},
+        {.elementMapIndex = ELEMENT_MAP_INDEX_OF(buttonX),
+         .expectedRequirement = EPhysicalButton::X},
+        {.elementMapIndex = ELEMENT_MAP_INDEX_OF(buttonY),
+         .expectedRequirement = EPhysicalButton::Y},
+    };
+
+    for (const auto& test : testData)
+    {
+      Mapper::UElementMap elementMapToTest;
+      elementMapToTest.all[test.elementMapIndex] = std::make_unique<MockElementMapper>();
+
+      const Mapper mapperToTest(std::move(elementMapToTest.named), kEmptyForceFeedbackActuatorMap);
+
+      const SPhysicalCapabilities expectedPhysicalControllerRequirements = {
+          .button =
+              static_cast<unsigned int>(1u << static_cast<uint8_t>(test.expectedRequirement))};
+      const SPhysicalCapabilities actualPhysicalControllerRequirements =
+          mapperToTest.GetPhysicalControllerRequiredCapabilities();
+      TEST_ASSERT(actualPhysicalControllerRequirements == expectedPhysicalControllerRequirements);
+    }
+  }
+
+  // Tests each force feedback actuator one at a time to make sure that a mapper correctly reports
+  // when it requires it be supported by the physical controller backend.
+  TEST_CASE(Mapper_GetPhysicalControllerRequiredCapabilities_ForceFeedbackActuators)
+  {
+    const struct STestData
+    {
+      unsigned int actuatorMapIndex;
+      EForceFeedbackActuator expectedRequirement;
+    } testData[] = {
+        {.actuatorMapIndex = FFACTUATOR_MAP_INDEX_OF(leftMotor),
+         .expectedRequirement = EForceFeedbackActuator::LeftMotor},
+        {.actuatorMapIndex = FFACTUATOR_MAP_INDEX_OF(rightMotor),
+         .expectedRequirement = EForceFeedbackActuator::RightMotor}};
+
+    for (const auto& test : testData)
+    {
+      Mapper::UForceFeedbackActuatorMap actuatorMapToTest;
+      actuatorMapToTest.all[test.actuatorMapIndex].isPresent = true;
+
+      const Mapper mapperToTest({}, actuatorMapToTest.named);
+
+      const SPhysicalCapabilities expectedPhysicalControllerRequirements = {
+          .forceFeedbackActuator =
+              static_cast<unsigned int>(1u << static_cast<uint8_t>(test.expectedRequirement))};
+      const SPhysicalCapabilities actualPhysicalControllerRequirements =
+          mapperToTest.GetPhysicalControllerRequiredCapabilities();
+      TEST_ASSERT(actualPhysicalControllerRequirements == expectedPhysicalControllerRequirements);
     }
   }
 } // namespace XidiTest

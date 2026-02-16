@@ -279,6 +279,15 @@ namespace Xidi
         return name;
       }
 
+      /// Computes and returns the required capabilities of the physical controller. This is based
+      /// on from which specific elements of the physical controller this mapper object reads and to
+      /// which specific force feedback actuators it writes. In order for this mapper object to
+      /// function correctly, the physical controller backend must report physical controller
+      /// capabilities that either match or exceed the required capabilities reported by this
+      /// mapper.
+      /// @return Physical controller capabilities structure indicating this mapper's requirements.
+      SPhysicalCapabilities GetPhysicalControllerRequiredCapabilities(void) const;
+
       /// Maps from virtual force feedback effect magnitude component to physical force feedback
       /// actuator values.
       /// @param [in] virtualEffectComponents Virtual force feedback vector expressed as a magnitude
