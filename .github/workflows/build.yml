@@ -28,7 +28,7 @@ jobs:
 
     # 构建 x86 (Win32) 版本
     - name: Build x86 (Release)
-      run: msbuild Xidi.sln /p:Configuration=Release /p:Platform=x86
+      run: msbuild Xidi.sln /p:Configuration=Release /p:Platform=Win32
 
     # 构建 x64 版本
     - name: Build x64 (Release)
