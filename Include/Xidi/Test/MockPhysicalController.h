@@ -24,6 +24,10 @@ namespace XidiTest
 {
   using namespace ::Xidi::Controller;
 
+  /// Maximum number of physical controllers that the physical controller back-end will report as
+  /// being supported.
+  static constexpr TControllerIdentifier kMaxPhysicalControllerBackendCount = 6;
+
   /// Object used to exert behavioral control over the physical controller interface. The physical
   /// controller interface itself is implemented as free functions. Test cases can use instances of
   /// this object to control the behavior of that interface. All required state is maintained in an

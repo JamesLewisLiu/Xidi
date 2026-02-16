@@ -153,7 +153,7 @@ namespace Xidi
                   .ValueOr(UINT64_MAX);
 
       const size_t numDevicesFromSystem = joySystemDeviceInfo.size();
-      const size_t numVirtualDevices = _countof(controllers);
+      const size_t numVirtualDevices = Controller::VirtualController::GetActualCount();
       const size_t numDevicesTotal = numDevicesFromSystem + numVirtualDevices;
 
       // Initialize the joystick index map with conservative defaults.
@@ -464,7 +464,7 @@ namespace Xidi
       // These will be in
       // HKCU\System\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\Xidi#
       // and contain the name of the controller.
-      for (int i = 0; i < _countof(controllers); ++i)
+      for (int i = 0; i < Controller::VirtualController::GetActualCount(); ++i)
       {
         wchar_t valueData[64];
         const int valueDataCount = FillVirtualControllerName(
@@ -605,7 +605,9 @@ namespace Xidi
                     [Strings::kStrConfigurationSettingWorkaroundsActiveVirtualControllerMask]
                         .ValueOr(UINT64_MAX);
 
-            for (Controller::TControllerIdentifier i = 0; i < _countof(controllers); ++i)
+            for (Controller::TControllerIdentifier i = 0;
+                 i < Controller::VirtualController::GetActualCount();
+                 ++i)
             {
               controllers[i] = nullptr;
 

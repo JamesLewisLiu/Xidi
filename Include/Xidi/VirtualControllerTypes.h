@@ -27,7 +27,7 @@ namespace Xidi
     /// Maximum number of virtual controllers that Xidi supports. Not all will necessarily be
     /// physically present at any given time or even supported by the controller back-end. Highest
     /// allowable controller identifier is one less than this value.
-    inline constexpr TControllerIdentifier kVirtualControllerMaxCount = 4;
+    inline constexpr TControllerIdentifier kVirtualControllerMaxCount = 32;
 
     /// Enumerates all supported axis types using DirectInput terminology.
     /// It is not necessarily the case that all of these axes are present in a virtual controller.

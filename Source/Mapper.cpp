@@ -28,6 +28,7 @@
 #include "ForceFeedbackTypes.h"
 #include "Globals.h"
 #include "Strings.h"
+#include "VirtualController.h"
 #include "VirtualControllerTypes.h"
 
 namespace Xidi
@@ -485,7 +486,7 @@ namespace Xidi
                 }
               }
 
-              for (TControllerIdentifier i = 0; i < _countof(configuredMapper); ++i)
+              for (TControllerIdentifier i = 0; i < VirtualController::GetActualCount(); ++i)
               {
                 if (true ==
                     mapperConfigData.Contains(Strings::MapperTypeConfigurationNameString(i)))
@@ -522,13 +523,13 @@ namespace Xidi
                 defaultMapper = GetNull();
               }
 
-              for (TControllerIdentifier i = 0; i < _countof(configuredMapper); ++i)
+              for (TControllerIdentifier i = 0; i < VirtualController::GetActualCount(); ++i)
                 configuredMapper[i] = defaultMapper;
             }
 
             Infra::Message::Output(
                 Infra::Message::ESeverity::Info, L"Mappers assigned to controllers...");
-            for (TControllerIdentifier i = 0; i < _countof(configuredMapper); ++i)
+            for (TControllerIdentifier i = 0; i < VirtualController::GetActualCount(); ++i)
               Infra::Message::OutputFormatted(
                   Infra::Message::ESeverity::Info,
                   L"    [%u]: %s",
@@ -536,7 +537,7 @@ namespace Xidi
                   configuredMapper[i]->GetName().data());
           });
 
-      if (controllerIdentifier >= _countof(configuredMapper))
+      if (controllerIdentifier >= VirtualController::GetActualCount())
       {
         Infra::Message::OutputFormatted(
             Infra::Message::ESeverity::Error,

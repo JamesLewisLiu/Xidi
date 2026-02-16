@@ -62,31 +62,6 @@ namespace Xidi
     /// Interface pointer for the configured physical controller backend.
     static IPhysicalControllerBackend* physicalControllerBackend = nullptr;
 
-    /// Initializes the configured physical controller backend. Must only be invoked once.
-    static void InitializePhysicalControllerBackend(void)
-    {
-      std::wstring_view selectedBackend =
-          Globals::GetConfigurationData()[Infra::Configuration::kSectionNameGlobal]
-                                         [Strings::kStrConfigurationSettingControllerBackend]
-                                             .ValueOr(L"");
-      physicalControllerBackend =
-          ((true == selectedBackend.empty())
-               ? new PhysicalControllerBackendXInput()
-               : GetPhysicalControllerBackendInterface(selectedBackend));
-
-      if (nullptr == physicalControllerBackend)
-      {
-        Infra::Message::OutputFormatted(
-            Infra::Message::ESeverity::Error,
-            L"Physical controller backend \"%.*s\" could not be located. Using the built-in default backend instead.",
-            static_cast<int>(selectedBackend.length()),
-            selectedBackend.data());
-        physicalControllerBackend = new PhysicalControllerBackendXInput();
-      }
-
-      physicalControllerBackend->Initialize();
-    }
-
     /// Computes an opaque source identifier from a given controller identifier.
     /// @param [in] controllerIdentifier Identifier of the physical controller for which an
     /// identifier is needed.
@@ -97,7 +72,8 @@ namespace Xidi
       return (uint32_t)controllerIdentifier;
     }
 
-    /// Reads physical controller state.
+    /// Reads physical controller state. Called very often and therefore, for the sake of
+    /// performance, accesses the backend pointer directly.
     /// @param [in] controllerIdentifier Identifier of the controller on which to operate.
     /// @return Physical state of the identified controller.
     static SPhysicalState ReadPhysicalControllerState(TControllerIdentifier controllerIdentifier)
@@ -128,7 +104,8 @@ namespace Xidi
           std::min(scaledVibrationStrength, kMaxVibrationStrength));
     }
 
-    /// Writes a vibration command to a physical controller.
+    /// Writes a vibration command to a physical controller. Called very often and therefore, for
+    /// the sake of performance, accesses the backend pointer directly.
     /// @param [in] controllerIdentifier Identifier of the controller on which to operate.
     /// @param [in] vibration Physical actuator vibration vector.
     /// @return `true` if successful, `false` otherwise.
@@ -263,7 +240,7 @@ namespace Xidi
     /// @param [in] controllerIdentifier Identifier of the controller to monitor.
     static void MonitorPhysicalControllerStatus(TControllerIdentifier controllerIdentifier)
     {
-      if (controllerIdentifier >= kVirtualControllerMaxCount)
+      if (controllerIdentifier >= VirtualController::GetActualCount())
       {
         Infra::Message::OutputFormatted(
             Infra::Message::ESeverity::Error,
@@ -326,9 +303,8 @@ namespace Xidi
       }
     }
 
-    /// Initializes internal data structures and creates worker threads.
-    /// Idempotent and concurrency-safe.
-    static void Initialize(void)
+    /// Initializes the configured physical controller backend. Idempotent and concurrency-safe.
+    static void InitializePhysicalControllerBackend(void)
     {
       // There is overhead to using call_once, even after the operation is completed, and physical
       // controller functions are called frequently. Using this additional flag avoids that overhead
@@ -345,13 +321,56 @@ namespace Xidi
             // proceeding. This call is idempotent.
             LoadConfiguredPlugins();
 
-            // Initialize the physical controller backend based on what is specified in the
-            // configuration file.
-            InitializePhysicalControllerBackend();
+            std::wstring_view selectedBackend =
+                Globals::GetConfigurationData()[Infra::Configuration::kSectionNameGlobal]
+                                               [Strings::kStrConfigurationSettingControllerBackend]
+                                                   .ValueOr(L"");
+            physicalControllerBackend =
+                ((true == selectedBackend.empty())
+                     ? new PhysicalControllerBackendXInput()
+                     : GetPhysicalControllerBackendInterface(selectedBackend));
+
+            if (nullptr == physicalControllerBackend)
+            {
+              Infra::Message::OutputFormatted(
+                  Infra::Message::ESeverity::Error,
+                  L"Physical controller backend \"%.*s\" could not be located. Using the built-in default backend instead.",
+                  static_cast<int>(selectedBackend.length()),
+                  selectedBackend.data());
+              physicalControllerBackend = new PhysicalControllerBackendXInput();
+            }
+
+            physicalControllerBackend->Initialize();
+            isInitialized = true;
+          });
+    }
+
+    /// Initializes internal data structures and creates worker threads. Idempotent and
+    /// concurrency-safe.
+    static void Initialize(void)
+    {
+      // There is overhead to using call_once, even after the operation is completed, and physical
+      // controller functions are called frequently. Using this additional flag avoids that overhead
+      // in the common case.
+      static bool isInitialized = false;
+      if (true == isInitialized) return;
+
+      static std::once_flag initFlag;
+      std::call_once(
+          initFlag,
+          []() -> void
+          {
+            Infra::Message::OutputFormatted(
+                Infra::Message::ESeverity::Info,
+                L"Selected physical controller backend \"%.*s\" and creating %u virtual controller%s.",
+                static_cast<int>(GetPhysicalControllerBackend()->PluginName().length()),
+                GetPhysicalControllerBackend()->PluginName().data(),
+                static_cast<unsigned int>(VirtualController::GetActualCount()),
+                ((1 == VirtualController::GetActualCount()) ? L"" : L"s"));
 
             // Initialize controller state data structures.
             for (auto controllerIdentifier = 0;
-                 controllerIdentifier < _countof(physicalControllerState);
+                 controllerIdentifier < VirtualController::GetActualCount();
                  ++controllerIdentifier)
             {
               const SPhysicalState initialPhysicalState =
@@ -393,7 +412,8 @@ namespace Xidi
             }
 
             // Create and start the polling threads.
-            for (auto controllerIdentifier = 0; controllerIdentifier < kVirtualControllerMaxCount;
+            for (auto controllerIdentifier = 0;
+                 controllerIdentifier < VirtualController::GetActualCount();
                  ++controllerIdentifier)
             {
               std::thread(PollForPhysicalControllerStateChanges, controllerIdentifier).detach();
@@ -408,7 +428,8 @@ namespace Xidi
             // threads.
             physicalControllerForceFeedbackBuffer =
                 new ForceFeedback::Device[kVirtualControllerMaxCount];
-            for (auto controllerIdentifier = 0; controllerIdentifier < kVirtualControllerMaxCount;
+            for (auto controllerIdentifier = 0;
+                 controllerIdentifier < VirtualController::GetActualCount();
                  ++controllerIdentifier)
             {
               std::thread(ForceFeedbackActuateEffects, controllerIdentifier).detach();
@@ -423,7 +444,8 @@ namespace Xidi
             // if the messages generated by those threads will actually be delivered as output.
             if (Infra::Message::WillOutputMessageOfSeverity(Infra::Message::ESeverity::Warning))
             {
-              for (auto controllerIdentifier = 0; controllerIdentifier < kVirtualControllerMaxCount;
+              for (auto controllerIdentifier = 0;
+                   controllerIdentifier < VirtualController::GetActualCount();
                    ++controllerIdentifier)
               {
                 std::thread(MonitorPhysicalControllerStatus, controllerIdentifier).detach();
@@ -440,7 +462,7 @@ namespace Xidi
 
     IPhysicalControllerBackend* GetPhysicalControllerBackend(void)
     {
-      Initialize();
+      InitializePhysicalControllerBackend();
       return physicalControllerBackend;
     }
 
@@ -467,7 +489,7 @@ namespace Xidi
     {
       Initialize();
 
-      if (controllerIdentifier >= kVirtualControllerMaxCount)
+      if (controllerIdentifier >= VirtualController::GetActualCount())
       {
         Infra::Message::OutputFormatted(
             Infra::Message::ESeverity::Error,
@@ -487,7 +509,7 @@ namespace Xidi
     {
       Initialize();
 
-      if (controllerIdentifier >= kVirtualControllerMaxCount)
+      if (controllerIdentifier >= VirtualController::GetActualCount())
       {
         Infra::Message::OutputFormatted(
             Infra::Message::ESeverity::Error,
@@ -507,7 +529,7 @@ namespace Xidi
     {
       Initialize();
 
-      if (controllerIdentifier >= kVirtualControllerMaxCount) return false;
+      if (controllerIdentifier >= VirtualController::GetActualCount()) return false;
 
       return physicalControllerState[controllerIdentifier].WaitForUpdate(state, stopToken);
     }
@@ -517,7 +539,7 @@ namespace Xidi
     {
       Initialize();
 
-      if (controllerIdentifier >= kVirtualControllerMaxCount) return false;
+      if (controllerIdentifier >= VirtualController::GetActualCount()) return false;
 
       return rawVirtualControllerState[controllerIdentifier].WaitForUpdate(state, stopToken);
     }

@@ -219,6 +219,13 @@ namespace Xidi
           (1 + kControllerIdentifier));
     }
 
+    TControllerIdentifier VirtualController::GetActualCount(void)
+    {
+      static const TControllerIdentifier kActualVirtualControllerCount = std::min(
+          kVirtualControllerMaxCount, GetPhysicalControllerBackend()->MaxPhysicalControllerCount());
+      return kActualVirtualControllerCount;
+    }
+
     void VirtualController::ApplyProperties(SState& controllerState) const
     {
       const SCapabilities capabilities = GetCapabilities();

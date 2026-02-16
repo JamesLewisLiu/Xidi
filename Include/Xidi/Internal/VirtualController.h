@@ -316,6 +316,12 @@ namespace Xidi
       /// for force feedback.
       ~VirtualController(void);
 
+      /// Determines and returns the actual number of virtual controllers. This is based on both the
+      /// maximum number of virtual controllers that Xidi supports and the maximum number of
+      /// controllers with which the configured physical controller backend can communicate.
+      /// @return Actual number of virtual controllers.
+      static TControllerIdentifier GetActualCount(void);
+
       /// Modifies the contents of the specified controller state object by applying this virtual
       /// controller's properties. Primarily intended for internal use but exposed for testing
       /// purposes. Implementation is not concurrency-safe.

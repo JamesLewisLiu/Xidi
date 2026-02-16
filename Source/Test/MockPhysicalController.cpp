@@ -24,7 +24,6 @@
 #include "Mapper.h"
 #include "PhysicalController.h"
 #include "PhysicalControllerTypes.h"
-#include "VirtualController.h"
 
 namespace XidiTest
 {
@@ -36,12 +35,12 @@ namespace XidiTest
 
   /// Guards all mock physical state data structures, one per physical controller.
   /// Even in tests, additional threads may exist to wait for state changes.
-  static std::shared_mutex mockPhysicalStateGuard[kVirtualControllerMaxCount];
+  static std::shared_mutex mockPhysicalStateGuard[kMaxPhysicalControllerBackendCount];
 
   /// Holds pointers to all mock physical controller objects, one per physical controller.
   /// Each such object governs the behavior of the physical controller interface for a given
   /// physical controller.
-  static MockPhysicalController* mockPhysicalController[kVirtualControllerMaxCount];
+  static MockPhysicalController* mockPhysicalController[kMaxPhysicalControllerBackendCount];
 
   MockPhysicalController::MockPhysicalController(
       TControllerIdentifier controllerIdentifier,
@@ -57,7 +56,7 @@ namespace XidiTest
         mapper(mapper),
         forceFeedbackRegistration()
   {
-    if (controllerIdentifier >= kVirtualControllerMaxCount)
+    if (controllerIdentifier >= kMaxPhysicalControllerBackendCount)
       TEST_FAILED_BECAUSE(
           L"%s: Invalid controller identifier (%u).", __FUNCTIONW__, controllerIdentifier);
 
@@ -148,8 +147,7 @@ namespace Xidi
       // IPhysicalControllerBackend
       TPhysicalControllerIndex MaxPhysicalControllerCount(void) override
       {
-        // Hard-coded for testing.
-        return 4;
+        return kMaxPhysicalControllerBackendCount;
       }
 
       bool SupportsControllerByGuidAndPath(const wchar_t* guidAndPath) override
@@ -196,7 +194,7 @@ namespace Xidi
 
     SCapabilities GetVirtualControllerCapabilities(TControllerIdentifier controllerIdentifier)
     {
-      if (controllerIdentifier >= kVirtualControllerMaxCount)
+      if (controllerIdentifier >= kMaxPhysicalControllerBackendCount)
         TEST_FAILED_BECAUSE(
             L"%s: Invalid controller identifier (%u).", __FUNCTIONW__, controllerIdentifier);
 
@@ -213,7 +211,7 @@ namespace Xidi
 
     SPhysicalState GetCurrentPhysicalControllerState(TControllerIdentifier controllerIdentifier)
     {
-      if (controllerIdentifier >= kVirtualControllerMaxCount)
+      if (controllerIdentifier >= kMaxPhysicalControllerBackendCount)
         TEST_FAILED_BECAUSE(
             L"%s: Invalid controller identifier (%u).", __FUNCTIONW__, controllerIdentifier);
 
@@ -230,7 +228,7 @@ namespace Xidi
 
     SState GetCurrentRawVirtualControllerState(TControllerIdentifier controllerIdentifier)
     {
-      if (controllerIdentifier >= kVirtualControllerMaxCount)
+      if (controllerIdentifier >= kMaxPhysicalControllerBackendCount)
         TEST_FAILED_BECAUSE(
             L"%s: Invalid controller identifier (%u).", __FUNCTIONW__, controllerIdentifier);
 
@@ -248,7 +246,7 @@ namespace Xidi
     ForceFeedback::Device* PhysicalControllerForceFeedbackRegister(
         TControllerIdentifier controllerIdentifier, const VirtualController* virtualController)
     {
-      if (controllerIdentifier >= kVirtualControllerMaxCount)
+      if (controllerIdentifier >= kMaxPhysicalControllerBackendCount)
         TEST_FAILED_BECAUSE(
             L"%s: Invalid controller identifier (%u).", __FUNCTIONW__, controllerIdentifier);
 
@@ -267,7 +265,7 @@ namespace Xidi
     void PhysicalControllerForceFeedbackUnregister(
         TControllerIdentifier controllerIdentifier, const VirtualController* virtualController)
     {
-      if (controllerIdentifier >= kVirtualControllerMaxCount)
+      if (controllerIdentifier >= kMaxPhysicalControllerBackendCount)
         TEST_FAILED_BECAUSE(
             L"%s: Invalid controller identifier (%u).", __FUNCTIONW__, controllerIdentifier);
 
@@ -285,7 +283,7 @@ namespace Xidi
         SPhysicalState& state,
         std::stop_token stopToken)
     {
-      if (controllerIdentifier >= kVirtualControllerMaxCount)
+      if (controllerIdentifier >= kMaxPhysicalControllerBackendCount)
         TEST_FAILED_BECAUSE(
             L"%s: Invalid controller identifier (%u).", __FUNCTIONW__, controllerIdentifier);
 
@@ -321,7 +319,7 @@ namespace Xidi
     bool WaitForRawVirtualControllerStateChange(
         TControllerIdentifier controllerIdentifier, SState& state, std::stop_token stopToken)
     {
-      if (controllerIdentifier >= kVirtualControllerMaxCount)
+      if (controllerIdentifier >= kMaxPhysicalControllerBackendCount)
         TEST_FAILED_BECAUSE(
             L"%s: Invalid controller identifier (%u).", __FUNCTIONW__, controllerIdentifier);
 
