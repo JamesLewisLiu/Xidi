@@ -1,0 +1,76 @@
+name: Build and Release Xidi
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch: # 允许手动触发
+
+permissions:
+  contents: write # 需要写入权限来创建 Release
+
+jobs:
+  build:
+    name: Build Xidi (Windows)
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive # 确保拉取子模块（如果 Xidi 有依赖）
+
+    - name: Add MSBuild to PATH
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Restore NuGet Packages
+      run: nuget restore Xidi.sln
+
+    # 构建 x86 (Win32) 版本
+    - name: Build x86 (Release)
+      run: msbuild Xidi.sln /p:Configuration=Release /p:Platform=x86
+
+    # 构建 x64 版本
+    - name: Build x64 (Release)
+      run: msbuild Xidi.sln /p:Configuration=Release /p:Platform=x64
+
+    # 打包制品 (为了方便用户下载，打包成 ZIP)
+    - name: Package Artifacts
+      shell: pwsh
+      run: |
+        # 创建输出目录
+        New-Item -ItemType Directory -Force -Path artifacts/x86
+        New-Item -ItemType Directory -Force -Path artifacts/x64
+        
+        # 复制构建好的 DLL (根据 Xidi 输出路径调整，通常是 Release 和 x64/Release)
+        # 注意：这里假设输出目录结构，如果 Xidi 自定义了输出路径，需要根据实际情况调整
+        Copy-Item -Path "Release\*.dll" -Destination "artifacts/x86" -Recurse -ErrorAction SilentlyContinue
+        Copy-Item -Path "x64\Release\*.dll" -Destination "artifacts/x64" -Recurse -ErrorAction SilentlyContinue
+        
+        # 压缩
+        Compress-Archive -Path "artifacts/x86\*" -DestinationPath "Xidi-x86.zip"
+        Compress-Archive -Path "artifacts/x64\*" -DestinationPath "Xidi-x64.zip"
+
+    # 生成 Epoch 时间戳
+    - name: Generate Epoch Tag
+      id: tag
+      shell: pwsh
+      run: |
+        $epoch = [int][double]::Parse((Get-Date -UFormat %s))
+        echo "TAG_NAME=$epoch" >> $env:GITHUB_ENV
+        Write-Host "Generated Tag: $epoch"
+
+    # 创建 Release 并上传 (仅在 push 到主分支时触发，避免 PR 触发发布)
+    - name: Create Epoch Release
+      if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main')
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ env.TAG_NAME }}
+        name: Release ${{ env.TAG_NAME }}
+        draft: false
+        prerelease: false
+        files: |
+          Xidi-x86.zip
+          Xidi-x64.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
