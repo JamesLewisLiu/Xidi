@@ -62,7 +62,9 @@ jobs:
 
     # 创建 Release 并上传 (仅在 push 到主分支时触发，避免 PR 触发发布)
     - name: Create Epoch Release
-      if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main')
+      # 修改处：允许 'workflow_dispatch' (手动触发) 也能执行发布
+      # 同时也移除了对 master 分支的强行检查，方便你在其他分支测试
+      if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
       uses: softprops/action-gh-release@v1
       with:
         tag_name: ${{ env.TAG_NAME }}
