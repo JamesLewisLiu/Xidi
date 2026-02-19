@@ -34,22 +34,46 @@ jobs:
     - name: Build x64 (Release)
       run: msbuild Xidi.sln /p:Configuration=Release /p:Platform=x64
 
-    # 打包制品 (为了方便用户下载，打包成 ZIP)
+    # 打包制品
     - name: Package Artifacts
       shell: pwsh
       run: |
-        # 创建输出目录
-        New-Item -ItemType Directory -Force -Path artifacts/x86
-        New-Item -ItemType Directory -Force -Path artifacts/x64
+        # 设置遇到错误立即停止，防止静默失败
+        $ErrorActionPreference = 'Stop'
         
-        # 复制构建好的 DLL (根据 Xidi 输出路径调整，通常是 Release 和 x64/Release)
-        # 注意：这里假设输出目录结构，如果 Xidi 自定义了输出路径，需要根据实际情况调整
-        Copy-Item -Path "Release\*.dll" -Destination "artifacts/x86" -Recurse -ErrorAction SilentlyContinue
-        Copy-Item -Path "x64\Release\*.dll" -Destination "artifacts/x64" -Recurse -ErrorAction SilentlyContinue
+        # 屏蔽 New-Item 的默认输出
+        New-Item -ItemType Directory -Force -Path artifacts/x86 | Out-Null
+        New-Item -ItemType Directory -Force -Path artifacts/x64 | Out-Null
         
-        # 压缩
-        Compress-Archive -Path "artifacts/x86\*" -DestinationPath "Xidi-x86.zip"
-        Compress-Archive -Path "artifacts/x64\*" -DestinationPath "Xidi-x64.zip"
+        # 调试：打印所有生成的 DLL 文件路径
+        Write-Host "--- Debug: Found DLLs ---"
+        Get-ChildItem -Path "Output" -Recurse -Filter "*.dll" | Select-Object FullName
+        Write-Host "-------------------------"
+
+        $x86Path = ".\Output\Release\Win32\*.dll"
+        $x64Path = ".\Output\Release\x64\*.dll"
+
+        Write-Host "Copying x86 files..."
+        Copy-Item -Path $x86Path -Destination "artifacts\x86"
+        
+        Write-Host "Copying x64 files..."
+        Copy-Item -Path $x64Path -Destination "artifacts\x64"
+        
+        # 严谨检查：确保文件被成功复制，否则报错终止
+        if (-not (Test-Path "artifacts\x86\*.dll")) { throw "Error: No x86 DLLs found in artifacts\x86!" }
+        if (-not (Test-Path "artifacts\x64\*.dll")) { throw "Error: No x64 DLLs found in artifacts\x64!" }
+
+        Write-Host "Compressing files..."
+        Compress-Archive -Path "artifacts\x86\*" -DestinationPath "Xidi-x86.zip" -Force
+        Compress-Archive -Path "artifacts\x64\*" -DestinationPath "Xidi-x64.zip" -Force
+        Write-Host "Compression finished."
+
+    # 增加保留 Artifacts 步骤，方便你在 GitHub 网页端直接下载解压前的原始文件排查问题
+    - name: Upload Raw Artifacts for Debugging
+      uses: actions/upload-artifact@v4
+      with:
+        name: Xidi-Raw-Artifacts
+        path: artifacts/
 
     # 生成 Epoch 时间戳
     - name: Generate Epoch Tag
@@ -76,3 +100,4 @@ jobs:
           Xidi-x64.zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
