@@ -82,6 +82,8 @@ namespace Xidi
                   Strings::kStrConfigurationSettingPropertiesMouseSpeedScalingFactorPercent,
                   EValueType::Integer),
               ConfigurationFileLayoutNameAndValueType(
+                  Strings::kStrConfigurationSettingPropertiesCustomDeviceName, EValueType::String),
+              ConfigurationFileLayoutNameAndValueType(
                   Strings::kStrConfigurationSettingsPropertiesUseBuiltinProperties,
                   EValueType::Boolean),
               ConfigurationFileLayoutNameAndValueType(

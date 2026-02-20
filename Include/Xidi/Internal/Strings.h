@@ -115,6 +115,10 @@ namespace Xidi
         kStrConfigurationSettingPropertiesMouseSpeedScalingFactorPercent =
             L"MouseSpeedScalingFactorPercent";
 
+    /// Configuration file setting for customizing the product name of the virtual controller.
+    inline constexpr std::wstring_view kStrConfigurationSettingPropertiesCustomDeviceName =
+        L"CustomDeviceName";
+
     /// Configuration file setting for enabling or disabling built-in properties like deadzone and
     /// saturation, which are used for interfaces that do not normally allow for customization.
     inline constexpr std::wstring_view kStrConfigurationSettingsPropertiesUseBuiltinProperties =

@@ -427,8 +427,35 @@ namespace Xidi
     instanceInfo.dwDevType = DirectInputTypes<diVersion>::XinputGamepadDeviceType();
     FillVirtualControllerName(
         instanceInfo.tszInstanceName, _countof(instanceInfo.tszInstanceName), controllerId);
-    FillVirtualControllerName(
-        instanceInfo.tszProductName, _countof(instanceInfo.tszProductName), controllerId);
+
+    const auto customProductName =
+        Globals::GetConfigurationData()[Strings::kStrConfigurationSectionProperties]
+                                       [Strings::kStrConfigurationSettingPropertiesCustomDeviceName]
+                                           .Get<std::wstring_view>();
+
+    if (customProductName.has_value())
+    {
+      if constexpr (std::is_same_v<
+                        typename DirectInputTypes<diVersion>::CharType,
+                        typename DirectInputTypes<EDirectInputVersion::kLegacyA>::CharType>)
+        // ANSI character strings
+        std::wcstombs(
+            instanceInfo.tszProductName,
+            customProductName.value().data(),
+            _countof(instanceInfo.tszProductName));
+      else
+        // Unicode character strings
+        wcsncpy_s(
+            instanceInfo.tszProductName,
+            _countof(instanceInfo.tszProductName),
+            customProductName.value().data(),
+            _TRUNCATE);
+    }
+    else
+    {
+      FillVirtualControllerName(
+          instanceInfo.tszProductName, _countof(instanceInfo.tszProductName), controllerId);
+    }
 
     // DirectInput versions 5 and higher include extra members in this structure, and this is
     // indicated on input using the size member of the structure.
