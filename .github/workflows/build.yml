@@ -66,6 +66,9 @@ jobs:
         Compress-Archive -Path "artifacts\x86\*" -DestinationPath "Xidi-x86.zip" -Force
         Compress-Archive -Path "artifacts\x64\*" -DestinationPath "Xidi-x64.zip" -Force
         Write-Host "Compression finished."
+        cd Output/Release
+        7z a Xidi-x86.zip Win32/*
+        7z a Xidi-x64.zip x64/*
 
     # 增加保留 Artifacts 步骤，方便你在 GitHub 网页端直接下载解压前的原始文件排查问题
     - name: Upload Raw Artifacts for Debugging
@@ -97,6 +100,8 @@ jobs:
         files: |
           Xidi-x86.zip
           Xidi-x64.zip
+          Output/Release/Xidi-x86.zip
+          Output/Release/Xidi-x64.zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
