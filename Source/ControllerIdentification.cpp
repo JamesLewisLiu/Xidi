@@ -428,12 +428,14 @@ namespace Xidi
     FillVirtualControllerName(
         instanceInfo.tszInstanceName, _countof(instanceInfo.tszInstanceName), controllerId);
 
-    const std::wstring_view customProductName =
+    const auto& customProductNameSetting =
         Globals::GetConfigurationData()[Strings::kStrConfigurationSectionProperties]
-                                       [Strings::kStrConfigurationSettingPropertiesCustomDeviceName]
-                                           .ValueOr(L"");
+                                       [Strings::kStrConfigurationSettingPropertiesCustomDeviceName];
+    std::optional<std::wstring_view> customProductName;
+    if (customProductNameSetting.TypeIsString())
+      customProductName = customProductNameSetting.GetFirst().GetString();
 
-    if (false == customProductName.empty())
+    if (customProductName.has_value())
     {
       if constexpr (std::is_same_v<
                         typename DirectInputTypes<diVersion>::CharType,
@@ -441,14 +443,14 @@ namespace Xidi
         // ANSI character strings
         std::wcstombs(
             instanceInfo.tszProductName,
-            customProductName.data(),
+            customProductName.value().data(),
             _countof(instanceInfo.tszProductName));
       else
         // Unicode character strings
         wcsncpy_s(
             instanceInfo.tszProductName,
             _countof(instanceInfo.tszProductName),
-            customProductName.data(),
+            customProductName.value().data(),
             _TRUNCATE);
     }
     else
