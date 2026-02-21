@@ -432,8 +432,11 @@ namespace Xidi
         Globals::GetConfigurationData()[Strings::kStrConfigurationSectionProperties]
                                        [Strings::kStrConfigurationSettingPropertiesCustomDeviceName];
     std::optional<std::wstring_view> customProductName;
-    if (customProductNameSetting.TypeIsString())
-      customProductName = customProductNameSetting.GetFirst().GetString();
+    if (false == customProductNameSetting.Values().empty())
+    {
+      const auto& firstValue = *customProductNameSetting.Values().begin();
+      if (firstValue.TypeIsString()) customProductName = firstValue.GetString();
+    }
 
     if (customProductName.has_value())
     {
