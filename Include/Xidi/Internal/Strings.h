@@ -186,6 +186,10 @@ namespace Xidi
             XIDI_CONFIG_PROPERTIES_PREFIX_SATURATION_PERCENT
                 XIDI_CONFIG_PROPERTIES_SUFFIX_TRIGGER_RT;
 
+    /// Configuration file setting for customizing the virtual controller's display name.
+    inline constexpr std::wstring_view kStrConfigurationSettingPropertiesCustomPadName =
+        L"CustomPadName";
+
     /// Configuration file section name for specifying behavioral tweaks to work around bugs in
     /// games.
     inline constexpr std::wstring_view kStrConfigurationSectionWorkarounds = L"Workarounds";

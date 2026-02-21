@@ -114,6 +114,8 @@ namespace Xidi
               ConfigurationFileLayoutNameAndValueType(
                   Strings::kStrConfigurationSettingsPropertiesSaturationPercentTriggerRT,
                   EValueType::Integer),
+              ConfigurationFileLayoutNameAndValueType(
+                  Strings::kStrConfigurationSettingPropertiesCustomPadName, EValueType::String),
           }),
       ConfigurationFileLayoutSection(
           Strings::kStrConfigurationSectionWorkarounds,
