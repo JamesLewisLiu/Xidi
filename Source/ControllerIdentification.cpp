@@ -15,6 +15,7 @@
 #include <array>
 #include <memory>
 #include <optional>
+#include <type_traits>
 
 #include <Infra/Core/Configuration.h>
 #include <Infra/Core/Message.h>
@@ -440,21 +441,24 @@ namespace Xidi
 
     if (customProductName.has_value())
     {
-      if constexpr (std::is_same_v<
-                        typename DirectInputTypes<diVersion>::CharType,
-                        typename DirectInputTypes<EDirectInputVersion::kLegacyA>::CharType>)
+      using CharType = std::remove_all_extents_t<decltype(instanceInfo.tszProductName)>;
+      if constexpr (std::is_same_v<CharType, char>)
+      {
         // ANSI character strings
         std::wcstombs(
             instanceInfo.tszProductName,
             customProductName.value().data(),
             _countof(instanceInfo.tszProductName));
+      }
       else
+      {
         // Unicode character strings
         wcsncpy_s(
             instanceInfo.tszProductName,
             _countof(instanceInfo.tszProductName),
             customProductName.value().data(),
             _TRUNCATE);
+      }
     }
     else
     {
