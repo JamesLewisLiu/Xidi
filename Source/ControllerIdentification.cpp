@@ -157,6 +157,18 @@ namespace Xidi
     return useShortVirtualControllerNames;
   }
 
+  /// Retrieves the custom virtual controller name from configuration, if present.
+  /// @return Custom name for virtual controllers. Empty if custom naming is disabled.
+  static std::wstring_view CustomNameForVirtualControllers(void)
+  {
+    static const std::wstring customName = std::wstring(
+        Globals::GetConfigurationData()
+            [Strings::kStrConfigurationSectionProperties]
+            [Strings::kStrConfigurationSettingPropertiesCustomPadName]
+                .ValueOr(std::wstring_view()));
+    return customName;
+  }
+
   std::optional<bool> ApproximatelyEqualVendorAndProductId(
       std::wstring_view controllerStringA, std::wstring_view controllerStringB)
   {
@@ -459,6 +471,26 @@ namespace Xidi
   template <> int FillVirtualControllerName<LPSTR>(
       LPSTR buf, size_t bufcount, Controller::TControllerIdentifier controllerIndex)
   {
+    const std::wstring_view customControllerName = CustomNameForVirtualControllers();
+    if ((false == customControllerName.empty()) && (bufcount > 0))
+    {
+      const int customControllerNameLength = WideCharToMultiByte(
+          CP_ACP,
+          0,
+          customControllerName.data(),
+          (int)customControllerName.length(),
+          buf,
+          (int)(bufcount - 1),
+          nullptr,
+          nullptr);
+
+      if (customControllerNameLength > 0)
+      {
+        buf[customControllerNameLength] = '\0';
+        return customControllerNameLength;
+      }
+    }
+
     Infra::TemporaryBuffer<CHAR> xidiControllerNameFormatString;
     LoadStringA(
         Infra::ProcessInfo::GetThisModuleInstanceHandle(),
@@ -475,6 +507,15 @@ namespace Xidi
   template <> int FillVirtualControllerName<LPWSTR>(
       LPWSTR buf, size_t bufcount, Controller::TControllerIdentifier controllerIndex)
   {
+    const std::wstring_view customControllerName = CustomNameForVirtualControllers();
+    if (false == customControllerName.empty())
+      return swprintf_s(
+          buf,
+          bufcount,
+          L"%.*s",
+          (int)customControllerName.length(),
+          customControllerName.data());
+
     Infra::TemporaryBuffer<WCHAR> xidiControllerNameFormatString;
     LoadStringW(
         Infra::ProcessInfo::GetThisModuleInstanceHandle(),
